@@ -25,7 +25,8 @@ log = logging.getLogger(__name__)
 initial_extensions = [
     'cogs.fun',
     'cogs.admin',
-    'cogs.meta'
+    'cogs.meta',
+    # 'cogs.tracking'
 ]
 
 
@@ -47,7 +48,8 @@ class RoboRob(commands.Bot):
         super().__init__(
             command_prefix=_prefix,
             description=description,
-            pm_help=None
+            pm_help=None,
+            help_attrs=dict(hidden=True)
         )
 
         self.client_id = config.client_id

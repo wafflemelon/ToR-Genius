@@ -5,7 +5,7 @@
 
 # _Technically_ not copy pasted, but I skipped large chunks as they were
 # unneeded (at the time of writing this)
-
+import datetime
 import inspect
 import logging
 from collections import OrderedDict
@@ -33,13 +33,38 @@ class Boolean(SQLType):
         return 'BOOLEAN'
 
 
+class Datetime(SQLType):
+    python = datetime.datetime
+
+    def __init__(self, *, timezone=False):
+        self.timezone = timezone
+
+    def to_sql(self):
+        if self.timezone:
+            return 'TIMESTAMP WITH TIMEZONE'
+        return 'TIMESTAMP'
+
+
+class String(SQLType):
+    python = str
+
+    def to_sql(self):
+        return 'TEXT'
+
+
 class Integer(SQLType):
     python = int
 
-    def __init__(self, *, big=False):
+    def __init__(self, *, big=False, auto_increment=False):
         self.big = big
+        self.auto_increment = auto_increment
 
     def to_sql(self):
+        if self.auto_increment:
+            if self.big:
+                return 'BIGSERIAL'
+            return 'SERIAL'
+
         if self.big:
             return 'BIGINT'
 
@@ -112,6 +137,12 @@ class MaybeAcquire:
     async def __aexit__(self, *args):
         if self._cleanup:
             await self.pool.release(self._connection)
+
+
+class PrimaryKeyColumn(Column):
+    """Shortcut for primary key"""
+    def __init__(self):
+        super().__init__(Integer(auto_increment=True), primary_key=True)
 
 
 # noinspection PyMethodParameters
