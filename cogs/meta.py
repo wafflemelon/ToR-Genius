@@ -172,6 +172,10 @@ class Meta:
         await self.bot.set_guild_prefixes(ctx.guild, [';'])
         await ctx.auto_react()
 
+    @commands.command(aliases=['pong'])
+    async def ping(self, ctx):
+        await ctx.send('Pong! {:,.2}ms of latency! 🏓'.format(self.bot.latency))
+
     @commands.command(aliases=['fb'])
     @commands.cooldown(rate=1, per=5, type=commands.BucketType.user)
     async def feedback(self, ctx, *, body: str):
