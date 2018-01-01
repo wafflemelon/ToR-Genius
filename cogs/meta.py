@@ -178,7 +178,7 @@ class Meta:
 
     @commands.command(aliases=['pong'])
     async def ping(self, ctx):
-        await ctx.send('Pong! {:,.2}ms of latency! 🏓'.format(self.bot.latency))
+        await ctx.send(f'Pong! {self.bot.latency*1000:,.2}ms of latency! 🏓')
 
     @commands.command(aliases=['fb'])
     @commands.cooldown(rate=1, per=5, type=commands.BucketType.user)
