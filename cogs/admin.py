@@ -308,6 +308,10 @@ class Admin:
             except discord.HTTPException as e:
                 await ctx.send(f'Unexpected error: `{e}`')
 
+    @commands.command()
+    async def explode(self, ctx):
+        await ctx.auto_react()
+        await ctx.bot.logout()
 
 def setup(bot):
     bot.add_cog(Admin(bot))
