@@ -175,3 +175,6 @@ venv.bak/
 # End of https://www.gitignore.io/api/python,pycharm
 
 .idea/
+
+# WHY DO I NEED TO DO THIS WUT EVEN I DON'T UNDERSTAND
+!cogs/utils/config.py
