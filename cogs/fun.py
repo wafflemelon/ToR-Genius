@@ -32,7 +32,7 @@ class Fun:
     @commands.group(invoke_without_command=True)
     async def awesome(self, ctx):
         """Tells you your awesome status"""
-        query = 'SELECT is_awesome FROM fun_configs WHERE guild_id = $1;'
+        query = 'SELECT is_awesome FROM fun_config WHERE guild_id = $1;'
 
         val = await ctx.db.fetchval(query, ctx.guild.id)
         if val is None or not val:
@@ -47,7 +47,7 @@ class Fun:
     async def awesome_on(self, ctx):
         """Turns on your awesome status"""
         query = """
-    INSERT INTO fun_configs (guild_id, is_awesome) VALUES ($1, TRUE)
+    INSERT INTO fun_config (guild_id, is_awesome) VALUES ($1, TRUE)
     ON CONFLICT (guild_id)
       DO UPDATE SET
         is_awesome = EXCLUDED.is_awesome;"""
@@ -59,7 +59,7 @@ class Fun:
     async def awesome_off(self, ctx):
         """Turns off your awesome status"""
         query = """
-    INSERT INTO fun_configs (guild_id, is_awesome) VALUES ($1, FALSE)
+    INSERT INTO fun_config (guild_id, is_awesome) VALUES ($1, FALSE)
     ON CONFLICT (guild_id)
       DO UPDATE SET
         is_awesome = EXCLUDED.is_awesome;"""
@@ -75,7 +75,7 @@ class Fun:
         # guilds
         query = """
     SELECT is_awesome
-    FROM fun_configs
+    FROM fun_config
     WHERE guild_id = $1"""
 
         val = await ctx.db.fetchval(query, ctx.guild.id)
