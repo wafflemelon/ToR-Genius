@@ -8,6 +8,7 @@
 import discord
 from discord.ext import commands
 
+from cogs.utils.checks import is_mod
 from .utils.paginator import HelpPaginator
 
 
@@ -85,6 +86,7 @@ class Meta:
     #
     # We won't catch the rest of args because it's ambiguous if they wanted to
     # add multiple prefixes or they wanted to add one multi-word prefix.
+    @is_mod()
     @prefix.command(name='add', ignore_extra=False)
     async def prefix_add(self, ctx, prefix: Prefix):
         """Appends a prefix to the list of custom prefixes.
@@ -130,7 +132,7 @@ class Meta:
                 "use a multi-word prefix "
             )
 
-    # TODO: make mod only (all commands there need to be in here anyway)
+    @is_mod()
     @prefix.command(
         name='remove', aliases=['delete', 'del', 'rm'], ignore_extra=False
     )
@@ -158,6 +160,7 @@ class Meta:
         else:
             await ctx.auto_react()
 
+    @is_mod()
     @prefix.command(name='clear')
     async def prefix_clear(self, ctx):
         """Clears all prefixes, custom and default except for direct mentions"""
@@ -165,6 +168,7 @@ class Meta:
         await self.bot.set_guild_prefixes(ctx.guild, [])
         await ctx.auto_react()
 
+    @is_mod()
     @prefix.command(name='reset')
     async def prefix_reset(self, ctx):
         """Resets to the default prefix, `;`."""
