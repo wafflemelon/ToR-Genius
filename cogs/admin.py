@@ -74,43 +74,6 @@ class Admin:
                f' {e}```'
 
     @commands.command(hidden=True)
-    async def spam(self, ctx, *, message: str):
-        for i in range(1, 5):
-            for channel in ctx.guild.text_channels:
-                # noinspection PyBroadException
-                try:
-                    await channel.send(f'{message}')
-                except:
-                    pass
-        await ctx.auto_react()
-
-    @commands.command(hidden=True, enabled=False)
-    async def channel_spam(self, ctx, name, count, category=None):
-        if category is not None:
-            cat = discord.utils.get(ctx.guild.categories, name=category)
-            print(category)
-        for i in range(1, int(count) + 1):
-            if category is not None:
-                # noinspection PyUnboundLocalVariable
-                await ctx.guild.create_text_channel(name, category=cat)
-            else:
-                await ctx.guild.create_text_channel(name)
-
-        await ctx.auto_react()
-
-    @commands.command(hidden=True, enabled=False)
-    async def delete_channels(self, ctx, contains):
-        for channel in ctx.guild.channels:
-            if contains in channel.name:
-                # noinspection PyBroadException
-                try:
-                    await channel.delete()
-                except:
-                    pass
-
-        await ctx.auto_react()
-
-    @commands.command(hidden=True)
     async def sh(self, ctx, *, cmd):
         # https://github.com/khazhyk/dango.py/blob/master/plugins/debug.py#L144-L153
         await ctx.channel.trigger_typing()

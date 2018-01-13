@@ -14,7 +14,7 @@ import asyncpg
 import click
 
 import config
-from bot import RoboRob, initial_extensions
+from bot import TorGenius, initial_extensions
 from cogs.utils.db import Table
 
 
@@ -28,7 +28,7 @@ def setup_logging():
         log = logging.getLogger()
         log.setLevel(logging.INFO)
         handler = logging.FileHandler(
-            filename='roborob.log',
+            filename='torgenius.log',
             encoding='utf-8',
             mode='w'
         )
@@ -67,7 +67,7 @@ def run_bot():
         log.exception('Could not set up PostgreSQL. Exiting.')
         return
 
-    bot = RoboRob()
+    bot = TorGenius()
     bot.pool = pool
     bot.run()
 

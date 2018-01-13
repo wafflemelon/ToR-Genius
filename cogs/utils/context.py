@@ -2,8 +2,7 @@
 # Modified work Copyright (c) 2017 Perry Fraser
 #
 # Licensed under the MIT License. https://opensource.org/licenses/MIT
-
-
+import praw
 from discord.ext import commands
 
 
@@ -31,6 +30,8 @@ class Context(commands.Context):
         super().__init__(**kwargs)
         self.pool = self.bot.pool
         self.db = None
+
+        self.r = praw.Reddit('main', user_agent='ToR Discord Bot')
 
     async def _acquire(self, timeout):
         if self.db is None:

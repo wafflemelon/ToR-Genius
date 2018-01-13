@@ -1,4 +1,4 @@
-# Robo Rob
+# ToR Genius
 Something that's a lot like [Robo Danny](https://github.com/Rapptz/RoboDanny/).
 
 ## Notice:

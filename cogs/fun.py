@@ -12,9 +12,9 @@ from cogs.utils import db
 log = logging.getLogger(__name__)
 
 
-class FunConfig(db.Table, table_name='fun_config'):
-    guild_id = db.Column(db.Integer(big=True), primary_key=True)
-    is_awesome = db.Column(db.Boolean, default=False)
+# class FunConfig(db.Table, table_name='fun_config'):
+#     guild_id = db.Column(db.Integer(big=True), primary_key=True)
+#     is_awesome = db.Column(db.Boolean, default=False)
 
 
 class Fun:
@@ -23,13 +23,7 @@ class Fun:
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command()
-    async def hello(self, ctx):
-        name = ctx.author.nick if ctx.author.nick else ctx.author.name
-        await ctx.send(f'Hello, {name}!')
-        log.info(f'Hello command received from {ctx.author}')
-
-    @commands.group(invoke_without_command=True)
+    @commands.group(invoke_without_command=True, disabled=True)
     async def awesome(self, ctx):
         """Tells you your awesome status"""
         query = 'SELECT is_awesome FROM fun_config WHERE guild_id = $1;'

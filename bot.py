@@ -26,7 +26,7 @@ initial_extensions = [
     'cogs.fun',
     'cogs.admin',
     'cogs.meta',
-    # 'cogs.tracking'
+    'cogs.reddit'
 ]
 
 
@@ -43,7 +43,7 @@ def _prefix(bot, msg):
     return base
 
 
-class RoboRob(commands.Bot):
+class TorGenius(commands.Bot):
     def __init__(self):
         super().__init__(
             command_prefix=_prefix,
