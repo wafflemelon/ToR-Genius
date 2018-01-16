@@ -70,8 +70,8 @@ class Admin:
     async def __local_check(self, ctx):
         k = await self.bot.is_owner(ctx.author)
         if not k:
-            await ctx.send("I honestly don't know _why_ you thought that "
-                           "would work, but ok.")
+            # await ctx.send("I honestly don't know _why_ you thought that "
+            #                "would work, but ok.")
             return False
 
         return True
