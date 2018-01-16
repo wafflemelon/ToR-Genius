@@ -276,7 +276,7 @@ class Meta:
 
         obj = self.bot.get_command(command.replace('.', ' '))
         if obj is None:
-            return await ctx.send('Could not find command.')
+            return await ctx.send("I couldn't find that command. Sorry!")
 
         # since we found the command we're looking for, presumably anyway, let's
         # try to access the code itself

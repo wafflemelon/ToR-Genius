@@ -5,10 +5,7 @@
 
 import logging
 
-import discord
 from discord.ext import commands
-
-from cogs.utils import db
 
 log = logging.getLogger(__name__)
 
@@ -79,6 +76,14 @@ class Fun:
             await ctx.invoke(self.awesome_off)
         else:
             await ctx.invoke(self.awesome_on)
+
+    @commands.command(hidden=True, aliases=['nick', 'name'])
+    async def display_name(self, ctx, *, user: commands.MemberConverter = None):
+        """Made for fastfinge with <3"""
+        user = ctx.author if not user else user
+        await ctx.send(
+            f'{user.name}\'s display name is {user.display_name}.'
+        )
 
 
 def setup(bot):

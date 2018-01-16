@@ -10,6 +10,7 @@
 # sh command and run_subprocess from dango.py
 
 import asyncio
+import copy
 import inspect
 import io
 import subprocess
@@ -19,6 +20,8 @@ from contextlib import redirect_stdout
 
 import discord
 from discord.ext import commands
+
+from cogs.utils.context import Context
 
 
 async def run_subprocess(cmd, loop=None):
@@ -64,7 +67,13 @@ class Admin:
         return content.strip('` \n')
 
     async def __local_check(self, ctx):
-        return await self.bot.is_owner(ctx.author)
+        k = await self.bot.is_owner(ctx.author)
+        if not k:
+            await ctx.send("I honestly don't know _why_ you thought that "
+                           "would work, but ok.")
+            return False
+
+        return True
 
     @staticmethod
     def get_syntax_error(e):
@@ -111,9 +120,12 @@ class Admin:
         else:
             await ctx.auto_react()
 
-    @commands.command(name='reload', hidden=True)
+    @commands.command(name='reload', hidden=True, aliases=['r'])
     async def _reload(self, ctx, *, module):
         """Reloads a module."""
+        if not module.startswith('cogs.'):
+            module = f'cogs.{module}'
+
         # noinspection PyBroadException
         try:
             self.bot.unload_extension(module)
@@ -275,6 +287,39 @@ class Admin:
     async def explode(self, ctx):
         await ctx.auto_react()
         await ctx.bot.logout()
+
+    @commands.command(hidden=True)
+    async def game(self, ctx, *, game: str = None):
+        await self.bot.change_presence(
+            game=(discord.Game(name=game) if game else None)
+        )
+        await ctx.auto_react()
+
+    @commands.command(hidden=True)
+    async def set_nick(self, ctx, *, nick: str):
+        await ctx.guild.me.edit(nick=nick)
+        await ctx.auto_react()
+
+    # from
+    # https://github.com/khazhyk/dango.py/blob/master/plugins/debug.py#L155-L166
+    @commands.command(name="as", hidden=True)
+    async def _as(self, ctx, who: commands.MemberConverter, *, cmd):
+        """Run a command impersonating another user."""
+        fake_msg = copy.copy(ctx.message)
+
+        # noinspection PyProtectedMember
+        fake_msg._update(
+            ctx.message.channel,
+            dict(
+                content=ctx.prefix + cmd
+            )
+        )
+        fake_msg.author = who
+
+        new_ctx = await self.bot.get_context(fake_msg, cls=Context)
+
+        async with new_ctx.acquire(new_ctx, None):
+            await self.bot.invoke(new_ctx)
 
 
 def setup(bot):
