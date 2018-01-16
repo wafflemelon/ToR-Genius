@@ -8,7 +8,7 @@ from discord.ext.commands import IDConverter, BadArgument
 from prawcore.exceptions import NotFound
 
 from cogs.utils import db
-from cogs.utils.checks import is_mod
+from cogs.utils.checks import is_mod, tor_only
 from cogs.utils.paginator import Pages
 
 
@@ -86,16 +86,6 @@ class Reddit:
         self.bot = bot
 
     @staticmethod
-    async def __local_check(ctx):
-        ok = ctx.guild.id in [318873523579781132, 369960111679995905]
-        if not ok:
-            await ctx.send('This command only works on the ToR Discord so '
-                           'far. It\'ll work on all servers soon though!')
-            return False
-
-        return True
-
-    @staticmethod
     async def __error(ctx, error):
         if isinstance(error, BadArgument):
             await ctx.send(error)
@@ -131,6 +121,7 @@ class Reddit:
             await ctx.send("Couldn't find any results for that. Sorry! ):")
 
     @commands.group(invoke_without_command=True)
+    @tor_only()
     async def link(self, ctx, *, username: str):
         """Link a reddit account with your discord account.
 
@@ -226,6 +217,7 @@ ON CONFLICT (user_id)
 
     @link.command()
     @is_mod()
+    @tor_only()
     async def force(
             self, ctx, reddit_username: str,
             *, discord_username: commands.MemberConverter = None
@@ -293,6 +285,7 @@ WHERE reddit_username = $1
         return
 
     @commands.command()
+    @tor_only()
     async def all_accounts(self, ctx):
         """Get a list of all the reddit accounts"""
         query = """

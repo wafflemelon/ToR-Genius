@@ -7,6 +7,8 @@ import logging
 
 from discord.ext import commands
 
+from cogs.utils.checks import tor_only
+
 log = logging.getLogger(__name__)
 
 
@@ -78,6 +80,7 @@ class Fun:
             await ctx.invoke(self.awesome_on)
 
     @commands.command(hidden=True, aliases=['nick', 'name'])
+    @tor_only()
     async def display_name(self, ctx, *, user: commands.MemberConverter = None):
         """Made for fastfinge with <3"""
         user = ctx.author if not user else user

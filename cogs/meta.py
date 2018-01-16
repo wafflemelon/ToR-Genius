@@ -259,8 +259,6 @@ class Meta:
     @commands.command()
     async def source(self, ctx, *, command: str = None):
         """
-        Repo is private, so this won't work for a bit
-
         Displays my full source code or for a specific command.
         To display the source code of a subcommand you can separate it by
         periods, e.g. tag.create for the create subcommand of the tag command

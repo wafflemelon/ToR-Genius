@@ -17,7 +17,7 @@ from discord.ext import commands
 
 
 async def check_permissions(ctx, perms, *, check=all):
-    owner = ctx.bot.is_owner(ctx.author)
+    owner = await ctx.bot.is_owner(ctx.author)
     if owner:
         return True
 
@@ -51,5 +51,22 @@ async def check_guild_permissions(ctx, perms, *, check=all):
 def is_mod():
     async def pred(ctx):
         return await check_guild_permissions(ctx, {'ban_members': True})
+
+    return commands.check(pred)
+
+
+def tor_only():
+    async def pred(ctx):
+        owner = await ctx.bot.is_owner(ctx.author)
+        if owner:
+            return True
+
+        ok = ctx.guild.id in [318873523579781132, 369960111679995905]
+        if not ok:
+            await ctx.send('This command only works on the ToR Discord so '
+                           'far. It\'ll work on all servers soon though!')
+            return False
+
+        return True
 
     return commands.check(pred)
