@@ -11,6 +11,7 @@
 
 from discord.ext import commands
 
+
 # Once again, basically mostly stolen from
 # https://github.com/Rapptz/RoboDanny/blob/rewrite/cogs/utils/checks.py
 
@@ -29,6 +30,7 @@ async def check_permissions(ctx, perms, *, check=all):
 def has_permissions(*, check=all, **perms):
     async def pred(ctx):
         return await check_permissions(ctx, perms, check=check)
+
     return commands.check(pred)
 
 
@@ -48,5 +50,6 @@ async def check_guild_permissions(ctx, perms, *, check=all):
 
 def is_mod():
     async def pred(ctx):
-        return await check_guild_permissions(ctx, {'manage_guild': True})
+        return await check_guild_permissions(ctx, {'ban_members': True})
+
     return commands.check(pred)

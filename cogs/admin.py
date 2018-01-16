@@ -10,9 +10,9 @@
 # sh command and run_subprocess from dango.py
 
 import asyncio
-import subprocess
 import inspect
 import io
+import subprocess
 import textwrap
 import traceback
 from contextlib import redirect_stdout
@@ -271,7 +271,7 @@ class Admin:
             except discord.HTTPException as e:
                 await ctx.send(f'Unexpected error: `{e}`')
 
-    @commands.command()
+    @commands.command(hidden=True)
     async def explode(self, ctx):
         await ctx.auto_react()
         await ctx.bot.logout()

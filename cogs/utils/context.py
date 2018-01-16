@@ -38,9 +38,6 @@ class Context(commands.Context):
             self.db = await self.pool.acquire(timeout=timeout)
         return self.db
 
-    # async def acquire(self, timeout=None):
-    #     return _ContextDBAcquire(self, timeout)
-
     @property
     def acquire(self):
         return _ContextDBAcquire

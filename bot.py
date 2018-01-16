@@ -52,6 +52,8 @@ class TorGenius(commands.Bot):
             help_attrs=dict(hidden=True)
         )
 
+        _ = self.is_owner(discord.User)
+
         self.client_id = config.client_id
 
         self.add_command(self.do)

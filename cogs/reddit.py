@@ -1,11 +1,14 @@
 import asyncio
 import random
+import re
 
 import discord
 from discord.ext import commands
+from discord.ext.commands import IDConverter, BadArgument
 from prawcore.exceptions import NotFound
 
 from cogs.utils import db
+from cogs.utils.checks import is_mod
 from cogs.utils.paginator import Pages
 
 
@@ -14,12 +17,82 @@ class RedditConfig(db.Table, table_name='reddit_config'):
     reddit_username = db.Column(db.String)
 
 
+class RedditMember:
+
+    @classmethod
+    async def create(cls, ctx, member):
+        self = RedditMember()
+
+        query = """
+SELECT reddit_username
+FROM reddit_config
+WHERE user_id = $1;
+        """
+
+        result = await ctx.db.fetchval(query, member.id)
+        if result is None:
+            raise LookupError()
+
+        self.reddit = result
+        self.user = member
+        return self
+
+
+def _get_from_guilds(bot, getter, argument):
+    result = None
+    for guild in bot.guilds:
+        result = getattr(guild, getter)(argument)
+        if result:
+            return result
+    return result
+
+
+class RedditAccountConverter(IDConverter):
+    async def convert(self, ctx, argument):
+
+        message = ctx.message
+        bot = ctx.bot
+        match = self._get_id_match(argument) or re.match(r'<@!?([0-9]+)>$',
+                                                         argument)
+        guild = message.guild
+        if match is None:
+            # not a mention...
+            if guild:
+                member = guild.get_member_named(argument)
+            else:
+                member = _get_from_guilds(bot, 'get_member_named', argument)
+        else:
+            user_id = int(match.group(1))
+            if guild:
+                member = guild.get_member(user_id)
+            else:
+                member = _get_from_guilds(bot, 'get_member', user_id)
+
+        if member is None:
+            raise BadArgument(f'Member "{argument}" not found')
+
+        try:
+            reddit_member = await RedditMember.create(ctx, member)
+        except LookupError:
+            raise BadArgument(f'No Reddit account for {member.display_name}. '
+                              f'They can create one with `{ctx.prefix}link '
+                              f'<reddit username>`')
+        else:
+            return reddit_member
+
+
 class Reddit:
     def __init__(self, bot):
         self.bot = bot
 
+    @staticmethod
+    async def __error(ctx, error):
+        if isinstance(error, BadArgument):
+            await ctx.send(error)
+
     @commands.command(name='wiki')
     async def reddit_wiki_page(self, ctx, *, search: str = None):
+        """Search the wiki pages on r/ToR for something."""
         sub = ctx.r.subreddit('transcribersofreddit')
         if not search:
             embed = discord.Embed(
@@ -47,8 +120,11 @@ class Reddit:
         else:
             await ctx.send("Couldn't find any results for that. Sorry! ):")
 
-    @commands.command()
+    @commands.group(invoke_without_command=True)
     async def link(self, ctx, *, username: str):
+        """Link a reddit account with your discord account.
+
+        This will replace any existing reddit accounts you have linked. """
         if username.startswith('/u/'):
             username = username.replace('/u/', '', 1)
         elif username.startswith('u/'):
@@ -62,6 +138,23 @@ class Reddit:
             pass
         except NotFound:
             await ctx.send("Sorry! That username doesn't appear to be valid.")
+            return
+
+        if ctx.author.guild_permissions.ban_members is True \
+                or await self.bot.is_owner(ctx.author):
+            # I'm bad at DRY
+
+            query = """
+INSERT INTO reddit_config (user_id, reddit_username) VALUES ($1, $2)
+ON CONFLICT (user_id)
+  DO UPDATE SET
+    reddit_username = EXCLUDED.reddit_username;"""
+
+            await ctx.db.execute(query, ctx.author.id, username)
+
+            await ctx.auto_react()
+            await ctx.send("You've been approved! Woo!")
+
             return
 
         msg = await ctx.send(
@@ -79,17 +172,17 @@ class Reddit:
             if u == self.bot.user:
                 return False
 
-            if u.id == self.bot.owner_id:
+            if self.bot.is_owner(u):
                 return True
 
             if r.message.guild is None:
                 return False
 
-            if r.emoji is not '✅' or '🚫':
+            if r.emoji not in ['✅', '🚫']:
                 return False
 
             resolved = u.guild_permissions
-            return resolved.manage_guild is True
+            return resolved.ban_members is True
 
         try:
             reaction, _ = await self.bot.wait_for(
@@ -121,35 +214,145 @@ ON CONFLICT (user_id)
             await ctx.auto_react()
             await ctx.send("You've been approved! Woo!")
 
-    @commands.command()
-    async def account(self, ctx, user: discord.Member = None):
+    @link.command()
+    @is_mod()
+    async def force(
+            self, ctx, reddit_username: str,
+            *, discord_username: commands.MemberConverter = None
+    ):
+        """Mod command for setting someones Reddit account."""
+        if not discord_username:
+            user = ctx.author
+        else:
+            user = discord_username
+
         query = """
-SELECT reddit_username
-FROM reddit_config
-WHERE user_id = $1;"""
+INSERT INTO reddit_config (user_id, reddit_username) VALUES ($1, $2)
+ON CONFLICT (user_id)
+  DO UPDATE SET
+    reddit_username = EXCLUDED.reddit_username;"""
 
-        is_self = user is None
-        user = ctx.author if not user else user
+        await ctx.db.execute(query, user.id, reddit_username)
 
-        val = await ctx.db.fetchval(query, user.id)
-        if val is None:
-            if is_self:
-                message = f'You have not set up your account yet. You can do ' \
-                          f'this with `{ctx.prefix}link <reddit username>`.'
-            else:
-                message = "That user hasn't set up their account yet."
+        await ctx.auto_react()
 
-            await ctx.send(message)
-            return
+    @commands.command()
+    async def account(self, ctx, *, user: RedditAccountConverter = None):
+        """Get the reddit account of a user, or yourself."""
 
-        description = f'{user.display_name}\'s Reddit account is' \
-                      f' [/u/{val}](https://reddit.com/u/{val}).'
+        user = await RedditMember.create(ctx, ctx.author) if not user else user
+
+        description = f'{user.user.display_name}\'s Reddit account is' \
+                      f' [/u/{user.reddit}]' \
+                      f'(https://reddit.com/u/{user.reddit}).'
 
         if random.randrange(1, 100) == 5:
             description += ' Please enjoy stalking them.'
 
         await ctx.send(embed=discord.Embed(description=description))
         return
+
+    @commands.command()
+    async def daccount(self, ctx, *, account: str):
+        """Get the discord account of a reddit user"""
+
+        query = """
+SELECT user_id
+FROM reddit_config
+WHERE reddit_username = $1
+        """
+
+        if account.startswith('/u/'):
+            account = account.replace('/u/', '', 1)
+        elif account.startswith('u/'):
+            account = account.replace('u/', '', 1)
+
+        val = await ctx.db.fetchval(query, account)
+        if val is None:
+            await ctx.send("I can't find that user. Sorry!")
+            return
+
+        user = self.bot.get_user(val)
+
+        description = f'[/u/{account}](https://reddit.com/u/{account})\'s' \
+                      f' Discord Account is {user.mention}.'
+        if random.randrange(1, 100) == 5:
+            description += ' Please enjoy stalking them.'
+
+        await ctx.send(embed=discord.Embed(description=description))
+        return
+
+    @commands.command()
+    async def all_accounts(self, ctx):
+        """Get a list of all the reddit accounts"""
+        query = """
+SELECT
+  user_id,
+  reddit_username
+FROM reddit_config;
+        """
+
+        results = await ctx.db.fetch(query)
+
+        if not results:
+            await ctx.send("I couldn't find any results! Sorry!")
+            return
+
+        p = Pages(
+            ctx, entries=tuple(
+                f'{self.bot.get_user(r[0]).mention}: '
+                f'[/u/{r[1]}](https://reddit.com/u/{r[1]})' for r in results
+            )
+        )
+
+        await p.paginate()
+
+    @commands.command()
+    async def flair_count(self, ctx, *, flair: str = "Unclaimed"):
+        """Get the number of posts left on r/ToR with a certain flair.
+
+        It's by default 'Unclaimed'."""
+        sub = ctx.r.subreddit('transcribersofreddit')
+
+        links = []
+
+        for submission in sub.new(limit=500):
+            if submission.link_flair_text == flair:
+                links.append(submission)
+
+        word = 'post' if len(links) == 1 else 'posts'
+
+        await ctx.send(
+            f'{len(links)} {flair} {word}!'
+        )
+
+        if len(links) == 0:
+            return
+
+        p = Pages(ctx, entries=tuple(
+            f'[{s.title.split(" | ")[2][1:-1]}]'
+            f'(https://reddit.com{s.permalink})'
+            for s in links
+        ))
+
+        await p.paginate()
+
+    @commands.group(invoke_without_command=True)
+    async def gammas(self, ctx, *, user: RedditAccountConverter = None):
+        user = await RedditMember.create(ctx, ctx.author) if not user else user
+
+        r_user = ctx.r.redditor(user.reddit)
+
+        for comment in r_user.comments.new(limit=None):
+            if comment.subreddit == 'TranscribersOfReddit':
+                # re formatting: I'm sorry
+                await ctx.send(embed=discord.Embed(
+                    description=
+                    f'[/u/{user.reddit}](https://reddit.com/u/{user.reddit}) '
+                    f'has {comment.author_flair_text.split(" ")[0]} '
+                    f'transcriptions! '
+                ))
+                return
 
 
 def setup(bot):

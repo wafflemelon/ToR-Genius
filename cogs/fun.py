@@ -5,6 +5,7 @@
 
 import logging
 
+import discord
 from discord.ext import commands
 
 from cogs.utils import db
@@ -23,7 +24,7 @@ class Fun:
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.group(invoke_without_command=True, disabled=True)
+    @commands.group(invoke_without_command=True, disabled=True, hidden=True)
     async def awesome(self, ctx):
         """Tells you your awesome status"""
         query = 'SELECT is_awesome FROM fun_config WHERE guild_id = $1;'
@@ -37,7 +38,7 @@ class Fun:
 
         await ctx.send(result)
 
-    @awesome.command(name='on', aliases=['yes', 'true'])
+    @awesome.command(name='on', aliases=['yes', 'true'], disabled=True)
     async def awesome_on(self, ctx):
         """Turns on your awesome status"""
         query = """

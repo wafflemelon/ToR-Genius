@@ -4,6 +4,8 @@
 # Licensed under the MIT License. https://opensource.org/licenses/MIT
 
 # Help command from R. Danny, along with feedback, pm, and prefixes
+import inspect
+import os
 
 import discord
 from discord.ext import commands
@@ -23,7 +25,7 @@ class Prefix(commands.Converter):
 
 
 class Meta:
-    """Meta stuff geddit haha so funny ikr"""
+    """Meta stuff relating to the bot itself"""
 
     def __init__(self, bot):
         self.bot = bot
@@ -48,7 +50,7 @@ class Meta:
                 if entity is None:
                     clean = command.replace('@', '@ ')  # non breaking space
                     return await ctx.send(
-                        f'Command or category "{clean} not found'
+                        f'Command or category "{clean}" not found'
                     )
                 elif isinstance(entity, commands.Command):
                     p = await HelpPaginator.from_command(ctx, entity)
@@ -178,6 +180,7 @@ class Meta:
 
     @commands.command(aliases=['pong'])
     async def ping(self, ctx):
+        """What do you think"""
         await ctx.send(f'Pong! {self.bot.latency*1000:,}ms of latency! 🏓')
 
     @commands.command(aliases=['fb'])
@@ -232,7 +235,7 @@ class Meta:
         await me.send(embed=embed)
         await ctx.auto_react(emoji='✅')
 
-    @commands.command()
+    @commands.command(hidden=True)
     @commands.is_owner()
     async def pm(self, ctx, user_id: int, *, content: str):
         user = self.bot.get_user(user_id)
@@ -249,6 +252,50 @@ class Meta:
             await ctx.send(f'Could not PM User (ID: {user_id})')
         else:
             await ctx.auto_react()
+
+    # From
+    # https://github.com/Rapptz/RoboDanny/blob/rewrite/cogs/meta.py#L163-L191
+    # So many levels of meta right here (some modifications)
+    @commands.command()
+    async def source(self, ctx, *, command: str = None):
+        """
+        Repo is private, so this won't work for a bit
+
+        Displays my full source code or for a specific command.
+        To display the source code of a subcommand you can separate it by
+        periods, e.g. tag.create for the create subcommand of the tag command
+        or by spaces.
+        """
+        source_url = 'https://github.com/perryprog/tor-genius'
+        if command is None:
+            return await ctx.send(
+                embed=discord.Embed(
+                    description=f'[perryprog/tor-genius]({source_url})'
+                )
+            )
+
+        obj = self.bot.get_command(command.replace('.', ' '))
+        if obj is None:
+            return await ctx.send('Could not find command.')
+
+        # since we found the command we're looking for, presumably anyway, let's
+        # try to access the code itself
+        src = obj.callback.__code__
+        lines, first_line_no = inspect.getsourcelines(src)
+        if not obj.callback.__module__.startswith('discord'):
+            # not a built-in command
+            location = os.path.relpath(src.co_filename).replace('\\', '/')
+        else:
+            location = obj.callback.__module__.replace('.', '/') + '.py'
+            source_url = 'https://github.com/Rapptz/discord.py'
+
+        final_url = f'<{source_url}/blob/master/{location}' \
+                    f'#L{first_line_no}-L{first_line_no + len(lines) - 1}>'
+        await ctx.send(
+            embed=discord.Embed(
+                description=f'[{location}]({final_url})'
+            )
+        )
 
 
 def setup(bot):
