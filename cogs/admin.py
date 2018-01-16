@@ -13,6 +13,7 @@ import asyncio
 import copy
 import inspect
 import io
+import random
 import subprocess
 import textwrap
 import traceback
@@ -290,9 +291,17 @@ class Admin:
 
     @commands.command(hidden=True)
     async def game(self, ctx, *, game: str = None):
-        await self.bot.change_presence(
-            game=(discord.Game(name=game) if game else None)
-        )
+        game = game if game else random.choice(self.bot.game_list)
+
+        if game != 'NONE':
+            await self.bot.change_presence(
+                game=discord.Game(name=game)
+            )
+        else:
+            await self.bot.change_presence(
+                game=None
+            )
+
         await ctx.auto_react()
 
     @commands.command(hidden=True)

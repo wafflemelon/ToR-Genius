@@ -8,6 +8,7 @@
 
 import copy
 import logging
+import random
 import sys
 import traceback
 
@@ -55,6 +56,10 @@ class TorGenius(commands.Bot):
         _ = self.is_owner(discord.User)
 
         self.client_id = config.client_id
+
+        # noinspection SpellCheckingInspection
+        self.game_list = ['corn', 'k', 'never gonna...', 'serdeff',
+                          'lauye9r v7&^*^*111', 'no', 'no u', 'farts r funny']
 
         self.add_command(self.do)
 
@@ -122,6 +127,12 @@ class TorGenius(commands.Bot):
 
     async def on_ready(self):
         print(f'Ready: {self.user} (ID: {self.user.id})')
+
+        game = random.choice(self.game_list)
+
+        await self.change_presence(
+            game=(discord.Game(name=game))
+        )
 
     async def process_commands(self, message):
         ctx = await self.get_context(message, cls=Context)
