@@ -86,6 +86,16 @@ class Reddit:
         self.bot = bot
 
     @staticmethod
+    async def __local_check(ctx):
+        ok = ctx.guild.id in [318873523579781132, 369960111679995905]
+        if not ok:
+            await ctx.send('This command only works on the ToR Discord so '
+                           'far. It\'ll work on all servers soon though!')
+            return False
+
+        return True
+
+    @staticmethod
     async def __error(ctx, error):
         if isinstance(error, BadArgument):
             await ctx.send(error)
