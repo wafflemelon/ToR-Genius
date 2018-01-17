@@ -28,7 +28,8 @@ initial_extensions = [
     'cogs.admin',
     'cogs.meta',
     'cogs.reddit',
-    'cogs.github'
+    'cogs.github',
+    'cogs.mod'
 ]
 
 
