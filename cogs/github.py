@@ -29,7 +29,9 @@ query {
         repositories(last: 100) {
             edges {
                 node {
-                    resourcePath
+                    resourcePath # Not using `url` because it's harder to show 
+                                 # the resourcePath. If we do both, that's extra
+                                 # code to process the data. 
                 }
             }
         }
