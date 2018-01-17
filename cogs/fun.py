@@ -4,6 +4,7 @@
 
 
 import logging
+import random
 
 from discord.ext import commands
 
@@ -86,6 +87,22 @@ class Fun:
         user = ctx.author if not user else user
         await ctx.send(
             f'{user.name}\'s display name is {user.display_name}.'
+        )
+
+    @commands.command()
+    async def choose(self, ctx, *choices: commands.clean_content):
+        """Pick a random item from user input.
+
+        For multiple items with multiple words, use double quotes."""
+
+        if len(choices) < 2:
+            # noinspection SpellCheckingInspection
+            await ctx.send('You need at least two choices plskthx')
+            return
+
+        await ctx.send(
+            f'Out of {", ".join(choices[:-1])}, and {choices[-1]}; I choose '
+            f'{random.choice(choices)}.'
         )
 
 
