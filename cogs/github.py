@@ -12,6 +12,7 @@ class Github:
 
     @commands.command()
     async def tor_repo(self, ctx, *, search: str = None):
+        """Search for a ToR related github repo. Search string can be "all"."""
         if not search:
             await ctx.send(
                 embed=discord.Embed(
