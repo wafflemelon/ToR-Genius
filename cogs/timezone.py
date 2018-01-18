@@ -118,7 +118,7 @@ WHERE user_id = $1;
         timezone = tz.gettz(result)
         formatter = datetime.now(tz=timezone)
         await ctx.send(f'Your time is: '
-                       f'{formatter.strftime("%a %b %d %I:%M %p %Y")}.')
+                       f'{formatter.strftime("%a %b %d %I:%M %p %Y, %Z")}.')
 
     @timezone.command()
     async def set(self, ctx, *, zone: TimezoneConverter):
@@ -143,7 +143,7 @@ ON CONFLICT (user_id)
         formatter = datetime.now(tz=timezone)
         await ctx.send(
             f'{member.user.display_name}\'s time is:'
-            f' {formatter.strftime("%a %b %d %I:%M %p %Y")}.'
+            f' {formatter.strftime("%a %b %d %I:%M %p %Y, %Z")}.'
         )
 
 
