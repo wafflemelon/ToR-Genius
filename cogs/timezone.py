@@ -1,3 +1,4 @@
+import re
 from datetime import datetime
 
 import pytz
@@ -19,6 +20,75 @@ class TimezoneConverter(commands.Converter):
             raise commands.BadArgument('Could not parse timezone')
         else:
             return argument
+
+
+class TimezoneMember:
+
+    @classmethod
+    async def create(cls, ctx, member):
+        self = TimezoneMember()
+
+        query = """
+SELECT timezone
+FROM timezones
+WHERE user_id = $1;
+        """
+
+        result = await ctx.db.fetchval(query, member.id)
+        if result is None:
+            raise LookupError()
+
+        self.timezone = result
+        self.user = member
+        return self
+
+
+def _get_from_guilds(bot, getter, argument):
+    result = None
+    for guild in bot.guilds:
+        result = getattr(guild, getter)(argument)
+        if result:
+            return result
+    return result
+
+
+class TimezoneMemberConverter(commands.IDConverter):
+    async def convert(self, ctx, argument):
+
+        message = ctx.message
+        bot = ctx.bot
+        match = self._get_id_match(argument) \
+                or re.match(
+            r'<@!?([0-9]+)>$',
+            argument
+        )
+
+        guild = message.guild
+        if match is None:
+            # not a mention...
+            if guild:
+                member = guild.get_member_named(argument)
+            else:
+                member = _get_from_guilds(bot, 'get_member_named', argument)
+        else:
+            user_id = int(match.group(1))
+            if guild:
+                member = guild.get_member(user_id)
+            else:
+                member = _get_from_guilds(bot, 'get_member', user_id)
+
+        if member is None:
+            raise commands.BadArgument(f'Member "{argument}" not found')
+
+        try:
+            timezone_member = await TimezoneMember.create(ctx, member)
+        except LookupError:
+            raise commands.BadArgument(f'No timezone set up for '
+                                       f'{member.display_name}. They can create'
+                                       f' one with `{ctx.prefix}timezone set '
+                                       f'<timezone>username>`')
+        else:
+            return timezone_member
 
 
 class Timezones:
@@ -60,6 +130,20 @@ ON CONFLICT (user_id)
 
         await ctx.db.execute(query, ctx.author.id, zone)
         await ctx.auto_react()
+
+    @timezone.command()
+    async def get(self, ctx, *, member: TimezoneConverter = None):
+        """Get the timezone of a user. If not specified, it's yourself."""
+
+        member = await TimezoneMember.create(ctx, ctx.author) \
+            if not member else member
+
+        timezone = tz.gettz(member.timezone)
+        formatter = datetime.now(tz=timezone)
+        await ctx.send(
+            f'{member.user.display_name}\'s time is:'
+            f' {formatter.strftime("%X, %Z")}.'
+        )
 
 
 def setup(bot):
