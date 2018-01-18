@@ -29,7 +29,8 @@ initial_extensions = [
     'cogs.meta',
     'cogs.reddit',
     'cogs.github',
-    'cogs.mod'
+    'cogs.mod',
+    'cogs.timezone'
 ]
 
 
