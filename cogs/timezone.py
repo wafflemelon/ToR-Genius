@@ -51,6 +51,7 @@ WHERE user_id = $1;
 
     @timezone.command()
     async def set(self, ctx, *, zone: TimezoneConverter):
+        """Set your current timezone. Doesn't yet support UTC offsets"""
         query = """
 INSERT INTO timezones (user_id, timezone) VALUES ($1, $2)
 ON CONFLICT (user_id)
