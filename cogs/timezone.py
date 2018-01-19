@@ -101,7 +101,7 @@ class Timezones:
         if isinstance(error, commands.BadArgument):
             await ctx.send(error)
 
-    @commands.group(invoke_without_command=True)
+    @commands.group(invoke_without_command=True, aliases=['tz', 'time'])
     async def timezone(self, ctx):
         """Get the timezone of other people and more!"""
         query = """
@@ -121,7 +121,7 @@ WHERE user_id = $1;
         await ctx.send(f'Your time is: '
                        f'{formatter.strftime("%a %b %d %I:%M %p %Y, %Z")}.')
 
-    @timezone.command()
+    @timezone.command(aliases=['s'])
     async def set(self, ctx, *, zone: TimezoneConverter):
         """Set your current timezone. Doesn't yet support UTC offsets."""
         query = """
@@ -133,7 +133,7 @@ ON CONFLICT (user_id)
         await ctx.db.execute(query, ctx.author.id, zone)
         await ctx.auto_react()
 
-    @timezone.command()
+    @timezone.command(aliases=['g'])
     async def get(self, ctx, *, member: TimezoneMemberConverter = None):
         """Get the timezone of a user. If not specified, it's yourself."""
 
@@ -147,9 +147,9 @@ ON CONFLICT (user_id)
             f' {formatter.strftime("%a %b %d %I:%M %p %Y, %Z")}.'
         )
 
-    @timezone.command()
+    @timezone.command(aliases=['search', 'ls'])
     async def list(self, ctx, search: str = ''):
-        """List all possible timezones, with an optional search string"""
+        """List all possible timezones, with an optional search string."""
 
         entries = [t for t in pytz.all_timezones if search in t.lower()]
         p = Pages(ctx, entries=entries)
