@@ -113,7 +113,7 @@ WHERE user_id = $1;
         if result is None:
             return await ctx.send(f'You haven\'t set up your timezone yet. '
                                   f'You can do this with `{ctx.prefix}'
-                                  f'timezone set EST`')
+                                  f'timezone set <timezone>`')
 
         timezone = tz.gettz(result)
         formatter = datetime.now(tz=timezone)
