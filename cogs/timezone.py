@@ -6,6 +6,7 @@ from dateutil import tz
 from discord.ext import commands
 
 from cogs.utils import db
+from cogs.utils.paginator import Pages
 
 
 class TimezoneDB(db.Table, table_name='timezones'):
@@ -145,6 +146,14 @@ ON CONFLICT (user_id)
             f'{member.user.display_name}\'s time is:'
             f' {formatter.strftime("%a %b %d %I:%M %p %Y, %Z")}.'
         )
+
+    @timezone.command()
+    async def list(self, ctx, search: str = ''):
+        """List all possible timezones, with an optional search string"""
+
+        entries = [t for t in pytz.all_timezones if search in t.lower()]
+        p = Pages(ctx, entries=entries)
+        await p.paginate()
 
 
 def setup(bot):
