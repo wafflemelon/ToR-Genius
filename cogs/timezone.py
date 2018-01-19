@@ -133,7 +133,7 @@ ON CONFLICT (user_id)
         await ctx.auto_react()
 
     @timezone.command()
-    async def get(self, ctx, *, member: TimezoneConverter = None):
+    async def get(self, ctx, *, member: TimezoneMemberConverter = None):
         """Get the timezone of a user. If not specified, it's yourself."""
 
         member = await TimezoneMember.create(ctx, ctx.author) \
