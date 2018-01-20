@@ -13,7 +13,7 @@ import os
 
 
 class Config:
-    """Used for prefix junk"""
+    """Stuff that doesn't make sense in a db I guess"""
 
     def __init__(self, name):
         self.name = name
@@ -39,6 +39,11 @@ class Config:
         self._db[str(key)] = value
         await self.save()
 
+    async def delete(self, key):
+        """Delete config value"""
+        del self._db[str(key)]
+        await self.save()
+
     def _dump(self):
         temp = '%s%s.tmp' % (uuid.uuid4(), self.name)
         with open(temp, 'w') as tmp:
@@ -53,3 +58,15 @@ class Config:
     async def save(self):
         async with self.lock:
             self.loop.run_in_executor(None, self._dump)
+
+    def __contains__(self, item):
+        return str(item) in self._db
+
+    def __getitem__(self, item):
+        return self._db[str(item)]
+
+    def __len__(self):
+        return len(self._db)
+
+    def all(self):
+        return self._db
