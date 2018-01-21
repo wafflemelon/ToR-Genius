@@ -19,6 +19,7 @@ import textwrap
 import traceback
 from contextlib import redirect_stdout
 
+import aiohttp
 import discord
 from discord.ext import commands
 
@@ -43,6 +44,14 @@ async def run_subprocess(cmd, loop=None):
         )
         res = await loop.run_in_executor(None, proc.communicate)
     return [s.decode('utf8') for s in res]
+
+
+async def haste_upload(text):
+    with aiohttp.ClientSession() as session:
+        async with session.post("https://hastebin.com/documents/", data=text,
+                                headers={"Content-Type": "text/plain"}) as r:
+            r = await r.json()
+            return r['key']
 
 
 class Admin:
@@ -97,7 +106,11 @@ class Admin:
         if serr:
             out = f'Stderr: ```{serr}```\n\n\n' + out
 
-        await ctx.send(out if out else ":ok_hand:")
+        try:
+            await ctx.send(out if out else ":ok_hand:")
+        except discord.HTTPException:
+            key = await haste_upload(out)
+            await ctx.send(f'https://hastebin.com/{key}')
 
     @commands.command(hidden=True)
     async def load(self, ctx, *, module):
@@ -173,19 +186,28 @@ class Admin:
             await ctx.send(f'```py\n{value}{traceback.format_exc()}\n```')
         else:
             value = stdout.getvalue()
-            # y u no work
             # noinspection PyBroadException
             try:
                 await ctx.message.add_reaction('✅')
+            # except discord.HTTPException:
+            #     haste_upload()
             except:
                 pass
 
             if ret is None:
                 if value:
-                    await ctx.send(f'```py\n{value}\n```')
+                    try:
+                        await ctx.send(f'```py\n{value}\n```')
+                    except discord.HTTPException:
+                        key = await haste_upload(value)
+                        await ctx.send(f'https://hastebin.com/{key}')
             else:
                 self._last_result = ret
-                await ctx.send(f'```py\n{value}{ret}\n```')
+                try:
+                    await ctx.send(f'```py\n{value}{ret}\n```')
+                except discord.HTTPException:
+                    key = await haste_upload(value + ret)
+                    await ctx.send(f'https://hastebin.com/{key}')
 
     @commands.command(pass_context=True, hidden=True)
     async def calc(self, ctx, *, body: str):
@@ -237,10 +259,18 @@ class Admin:
 
             if ret is None:
                 if value:
-                    await ctx.send(f'```py\n{value}\n```')
+                    try:
+                        await ctx.send(f'```py\n{value}\n```')
+                    except discord.HTTPException:
+                        key = await haste_upload(value)
+                        await ctx.send(f'https://hastebin.com/{key}')
             else:
                 self._last_result = ret
-                await ctx.send(f'```py\n{value}{ret}\n```')
+                try:
+                    await ctx.send(f'```py\n{value}{ret}\n```')
+                except discord.HTTPException:
+                    key = await haste_upload(value + ret)
+                    await ctx.send(f'https://hastebin.com/{key}')
 
     @commands.command(pass_context=True, hidden=True)
     async def repl(self, ctx):
