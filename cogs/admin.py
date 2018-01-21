@@ -188,6 +188,61 @@ class Admin:
                 await ctx.send(f'```py\n{value}{ret}\n```')
 
     @commands.command(pass_context=True, hidden=True)
+    async def calc(self, ctx, *, body: str):
+        """Evaluates some code with sympy imported"""
+
+        env = {
+            'bot': self.bot,
+            'ctx': ctx,
+            'channel': ctx.channel,
+            'author': ctx.author,
+            'guild': ctx.guild,
+            'message': ctx.message,
+            '_': self._last_result
+        }
+
+        env.update(globals())
+
+        body = self.cleanup_code(body)
+        body = body.splitlines()
+        body[-1] = f'return {body[-1]}'
+        body = '\n'.join(body)
+
+        stdout = io.StringIO()
+
+        to_compile = f'from sympy.abc import *\nfrom sympy import *\n' \
+                     f'async def func():\n{textwrap.indent(body, "  ")}'
+
+        # noinspection PyBroadException
+        try:
+            exec(to_compile, env)
+        except Exception as e:
+            return await ctx.send(f'```py\n{e.__class__.__name__}: {e}\n```')
+
+        func = env['func']
+        # noinspection PyBroadException
+        try:
+            with redirect_stdout(stdout):
+                ret = await func()
+        except Exception:
+            value = stdout.getvalue()
+            await ctx.send(f'```py\n{value}{traceback.format_exc()}\n```')
+        else:
+            value = stdout.getvalue()
+            # noinspection PyBroadException
+            try:
+                await ctx.message.add_reaction('✅')
+            except:
+                pass
+
+            if ret is None:
+                if value:
+                    await ctx.send(f'```py\n{value}\n```')
+            else:
+                self._last_result = ret
+                await ctx.send(f'```py\n{value}{ret}\n```')
+
+    @commands.command(pass_context=True, hidden=True)
     async def repl(self, ctx):
         """Launches an interactive REPL session."""
         variables = {

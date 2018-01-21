@@ -10,7 +10,7 @@ class Github:
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command()
+    @commands.command(aliases=['repo'])
     async def tor_repo(self, ctx, *, search: str = None):
         """Search for a ToR related github repo. Search string can be "all"."""
         if not search:
