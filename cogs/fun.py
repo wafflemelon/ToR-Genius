@@ -138,6 +138,13 @@ class Fun:
     @commands.command()
     async def discrim(self, ctx, discriminator: Discriminator,
                       *, selector: Selector = '='):
+        """Search for specific discriminators.
+
+        Optional parameter for ranges to be searched.
+
+        It can be >, >=, <=, or <.
+
+        Ranges between two numbers hasn't been implemented yet."""
         if selector == '>':
             p = Pages(ctx, entries=[
                 f'{u.display_name}#{u.discriminator}'
