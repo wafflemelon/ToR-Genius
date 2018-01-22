@@ -149,6 +149,14 @@ class Admin:
         else:
             await ctx.auto_react()
 
+    @staticmethod
+    def format_error(err):
+        if not err.text:
+            return f'```py\n{err.__class__.__name__}: {err}\n```'
+
+        return f'```py\n{err.text}{"↑":>{err.offset}}\n{type(err).__name__}:' \
+               f' {err}```'
+
     @commands.command(pass_context=True, hidden=True, name='eval')
     async def _eval(self, ctx, *, body: str):
         """Evaluates some code"""
@@ -170,11 +178,10 @@ class Admin:
 
         to_compile = f'async def func():\n{textwrap.indent(body, "  ")}'
 
-        # noinspection PyBroadException
         try:
             exec(to_compile, env)
-        except Exception as e:
-            return await ctx.send(f'```py\n{e.__class__.__name__}: {e}\n```')
+        except SyntaxError as e:
+            return await ctx.send(self.format_error(e))
 
         func = env['func']
         # noinspection PyBroadException
@@ -189,9 +196,7 @@ class Admin:
             # noinspection PyBroadException
             try:
                 await ctx.message.add_reaction('✅')
-            # except discord.HTTPException:
-            #     haste_upload()
-            except:
+            except BaseException:
                 pass
 
             if ret is None:
