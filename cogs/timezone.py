@@ -87,7 +87,7 @@ class TimezoneMemberConverter(commands.IDConverter):
             raise commands.BadArgument(f'No timezone set up for '
                                        f'{member.display_name}. They can create'
                                        f' one with `{ctx.prefix}timezone set '
-                                       f'<timezone>username>`')
+                                       f'<timezone>`')
         else:
             return timezone_member
 
