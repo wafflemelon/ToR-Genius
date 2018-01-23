@@ -31,7 +31,8 @@ initial_extensions = [
     'cogs.github',
     'cogs.mod',
     'cogs.timezone',
-    'cogs.info'
+    'cogs.info',
+    'cogs.other'
 ]
 
 
