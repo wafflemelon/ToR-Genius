@@ -9,27 +9,8 @@ import random
 from discord.ext import commands
 
 from cogs.utils.checks import tor_only
-from cogs.utils.paginator import Pages
 
 log = logging.getLogger(__name__)
-
-
-class Discriminator(commands.Converter):
-    async def convert(self, ctx, argument):
-        try:
-            if not int(argument) in range(1, 10000):
-                raise commands.BadArgument('That isn\'t a valid discriminator.')
-        except ValueError:
-            raise commands.BadArgument('That isn\'t a valid discriminator.')
-        else:
-            return int(argument)
-
-
-class Selector(commands.Converter):
-    async def convert(self, ctx, argument):
-        if argument not in ['>', '>=', '<', '<=', '=']:
-            raise commands.BadArgument('Not a valid selector')
-        return argument
 
 
 class Fun:
@@ -132,56 +113,6 @@ class Fun:
             f'<:tickYes:404815005423501313> **_'
             f'{member.name}#{member.discriminator} has been warned._**'
         )
-
-    # It's a converter, not a type annotation in this case
-    # noinspection PyTypeChecker
-    @commands.command()
-    async def discrim(self, ctx, discriminator: Discriminator,
-                      *, selector: Selector = '='):
-        """Search for specific discriminators.
-
-        Optional parameter for ranges to be searched.
-
-        It can be >, >=, <=, or <.
-
-        Ranges between two numbers hasn't been implemented yet."""
-        if selector == '>':
-            p = Pages(ctx, entries=[
-                f'{u.display_name}#{u.discriminator}'
-                for u in ctx.guild.members
-                if int(u.discriminator) > discriminator
-            ])
-        elif selector == '<':
-            p = Pages(ctx, entries=[
-                'f{u.display_name}#{u.discriminator}'
-                for u in ctx.guild.members
-                if int(u.discriminator) < discriminator
-            ])
-        elif selector == '>=':
-            p = Pages(ctx, entries=[
-                f'{u.display_name}#{u.discriminator}'
-                for u in ctx.guild.members
-                if int(u.discriminator) >= discriminator
-            ])
-        elif selector == '<=':
-            p = Pages(ctx, entries=[
-                f'{u.display_name}#{u.discriminator}'
-                for u in ctx.guild.members
-                if int(u.discriminator) <= discriminator
-            ])
-        elif selector == '=':
-            p = Pages(ctx, entries=[
-                f'{u.display_name}#{u.discriminator}'
-                for u in ctx.guild.members
-                if int(u.discriminator) == discriminator
-            ])
-        else:
-            raise commands.BadArgument('Could not parse arguments')
-
-        if not p.entries:
-            return await ctx.send('No results found.')
-
-        await p.paginate()
 
 
 def setup(bot):
