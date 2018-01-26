@@ -32,7 +32,8 @@ initial_extensions = [
     'cogs.mod',
     'cogs.timezone',
     'cogs.info',
-    'cogs.other'
+    'cogs.other',
+    'cogs.discrim'
 ]
 
 
