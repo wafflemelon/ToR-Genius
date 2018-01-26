@@ -129,6 +129,11 @@ class Pages:
         p.append('Confused? React with \N{INFORMATION SOURCE} for more info.')
         self.embed.description = '\n'.join(p)
         self.message = await self.channel.send(embed=self.embed)
+
+        await self.message.add_reaction('🔣')
+
+    async def add_rest_reactions(self):
+        await self.message.remove_reaction('🔣', self.message.guild.me)
         for (reaction, _) in self.reaction_emojis:
             if self.maximum_pages == 2 and reaction in ('\u23ed', '\u23ee'):
                 # no |<< or >>| buttons if we only have two pages
@@ -230,6 +235,10 @@ class Pages:
 
         if reaction.message.id != self.message.id:
             return False
+
+        if reaction.emoji == '🔣':
+            self.match = self.add_rest_reactions
+            return True
 
         for (emoji, func) in self.reaction_emojis:
             if reaction.emoji == emoji:
