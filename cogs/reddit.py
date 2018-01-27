@@ -173,8 +173,8 @@ ON CONFLICT (user_id)
             if u == self.bot.user:
                 return False
 
-            # if self.bot.is_owner(u):
-            #     return True
+            if self.bot.is_owner(u):
+                return True
 
             if r.message.guild is None:
                 return False
