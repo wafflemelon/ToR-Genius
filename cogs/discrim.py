@@ -5,7 +5,7 @@ import numpy as np
 from discord.ext import commands
 from scipy import stats
 
-from cogs.utils.paginator import EmbedPages
+from cogs.utils.paginator import EmbedPages, Pages
 
 
 class Discriminator(commands.Converter):
