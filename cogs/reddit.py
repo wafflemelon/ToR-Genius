@@ -182,8 +182,7 @@ ON CONFLICT (user_id)
             if r.emoji not in ['✅', '🚫']:
                 return False
 
-            resolved = u.guild_permissions
-            return resolved.ban_members is True
+            return r.message.channel.permissions_for(u).ban_members is True
 
         try:
             reaction, _ = await self.bot.wait_for(
