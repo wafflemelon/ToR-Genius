@@ -63,7 +63,8 @@ class Search:
                 try:
                     await ctx.send(to_send)
                 except discord.HTTPException:
-                    haste_upload(to_send + '\n' + '\n'.join(images))
+                    key = await haste_upload(to_send + '\n' + '\n'.join(images))
+                    await ctx.send(key)
             if embed_images:
                 p = EmbedPages(ctx, embeds=embed_images)
                 await p.paginate()
@@ -72,7 +73,8 @@ class Search:
         try:
             await ctx.send(code_block(t.draw()))
         except discord.HTTPException:
-            haste_upload(code_block(t.draw()))
+            key = await haste_upload(code_block(t.draw()))
+            await ctx.send(key)
         if embed_images:
             p = EmbedPages(ctx, embeds=embed_images)
             await p.paginate()
