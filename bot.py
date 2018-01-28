@@ -33,7 +33,8 @@ initial_extensions = [
     'cogs.timezone',
     'cogs.info',
     'cogs.other',
-    'cogs.discrim'
+    'cogs.discrim',
+    'cogs.search'
 ]
 
 
