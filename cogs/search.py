@@ -1,7 +1,14 @@
 import wolframalpha
 from discord.ext import commands
+from texttable import Texttable, ArraySizeError
 
 import config
+
+
+def code_block(string, lang=''):
+    if string.strip() == '':
+        return ''
+    return f'```{lang}\n{string}\n```'
 
 
 class Search:
@@ -20,9 +27,28 @@ class Search:
 
         client = wolframalpha.Client(config.wolfram)
         res = client.query(query)
-        await ctx.send(f'```\n'
-                       f'{"_____________".join([s.text for s in res.results])}'
-                       f'\n```')
+
+        t = Texttable()
+        data = []
+        images = []
+        for pod in res.pods:
+            sub_data = []
+            for sub in pod.subpods:
+                if sub.plaintext:
+                    sub_data.append(sub.plaintext)
+                if hasattr(sub, 'img'):
+                    images.append(sub['img']['@src'])
+            data.append(sub_data)
+
+        try:
+            t.add_rows(data)
+        except ArraySizeError:
+            return await ctx.send(
+                code_block('\n\n'.join([s.text for s in res.results]))
+                + '\n' + '\n'.join(images)
+            )
+
+        await ctx.send(code_block(t.draw()) + '\n'.join(images))
 
 
 def setup(bot):
