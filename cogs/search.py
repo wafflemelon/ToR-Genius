@@ -20,7 +20,9 @@ class Search:
 
         client = wolframalpha.Client(config.wolfram)
         res = client.query(query)
-        await ctx.send('_____________'.join([s.text for s in res.results]))
+        await ctx.send(f'```\n'
+                       f'{"_____________".join([s.text for s in res.results])}'
+                       f'\n```')
 
 
 def setup(bot):
