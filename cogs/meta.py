@@ -36,7 +36,7 @@ class Meta:
         if isinstance(error, commands.BadArgument):
             await ctx.send(error)
 
-    @commands.command(name='help')
+    @commands.command(name='help', aliases=['halp'])
     async def _help(self, ctx, *, command: str = None):
         """Helps you out a bit ;)"""
         # noinspection PyBroadException
