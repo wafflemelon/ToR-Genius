@@ -1,8 +1,10 @@
+import discord
 import wolframalpha
 from discord.ext import commands
 from texttable import Texttable, ArraySizeError
 
 import config
+from cogs.utils.paginator import EmbedPages
 
 
 def code_block(string, lang=''):
@@ -40,15 +42,27 @@ class Search:
                     images.append(sub['img']['@src'])
             data.append(sub_data)
 
+        embed_images = [
+            discord.Embed().set_image(url=image) for image in images
+        ]
+
         try:
             t.add_rows(data)
         except ArraySizeError:
-            return await ctx.send(
-                code_block('\n\n'.join([s.text for s in res.results]))
-                + '\n' + '\n'.join(images)
-            )
+            to_send = code_block('\n\n'.join([s.text for s in res.results]))
+            if to_send != '':
+                await ctx.send(
+                    code_block('\n\n'.join([s.text for s in res.results]))
+                )
+            if embed_images:
+                p = EmbedPages(ctx, embeds=embed_images)
+                await p.paginate()
+            return
 
         await ctx.send(code_block(t.draw()) + '\n'.join(images))
+        if embed_images:
+            p = EmbedPages(ctx, embeds=embed_images)
+            await p.paginate()
 
 
 def setup(bot):
