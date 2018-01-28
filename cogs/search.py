@@ -59,7 +59,7 @@ class Search:
                 await p.paginate()
             return
 
-        await ctx.send(code_block(t.draw()) + '\n'.join(images))
+        await ctx.send(code_block(t.draw()))
         if embed_images:
             p = EmbedPages(ctx, embeds=embed_images)
             await p.paginate()
