@@ -1,3 +1,5 @@
+import itertools
+
 import discord
 import wolframalpha
 from discord.ext import commands
@@ -40,6 +42,7 @@ class Search:
                     sub_data.append(sub.plaintext)
                 if hasattr(sub, 'img'):
                     images.append(sub['img']['@src'])
+                    # sub_data.append(sub['img']['@alt'])
             data.append(sub_data)
 
         embed_images = [
@@ -49,11 +52,14 @@ class Search:
         try:
             t.add_rows(data)
         except ArraySizeError:
-            to_send = code_block('\n\n'.join([s.text for s in res.results]))
-            if to_send != '':
-                await ctx.send(
-                    code_block('\n\n'.join([s.text for s in res.results]))
+            # to_send = code_block('\n\n'.join([s.text for s in res.results]))
+            to_send = code_block('\n\n'.join(
+                itertools.chain.from_iterable(
+                    data
                 )
+            ))
+            if to_send != '':
+                await ctx.send(to_send)
             if embed_images:
                 p = EmbedPages(ctx, embeds=embed_images)
                 await p.paginate()
