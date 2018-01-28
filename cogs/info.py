@@ -1,7 +1,7 @@
 from datetime import datetime
 
 import discord
-import humanize as humanize
+import humanize
 from discord.ext import commands
 
 # following is from
