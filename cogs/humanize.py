@@ -14,7 +14,7 @@ class Humanize:
         if isinstance(err, ValueError):
             await ctx.send("Couldn't parse input")
 
-    @commands.group(aliases=['human', 'hu'])
+    @commands.group(aliases=['human', 'hu', 'humanise'])
     async def humanize(self, ctx):
         """Human-fy stuff."""
         if ctx.invoked_subcommand is None:
