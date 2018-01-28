@@ -54,6 +54,11 @@ class Humanize:
         """Convert a filesize into a more readable """
         await ctx.send(humanize.naturalsize(val))
 
+    @humanize.command(aliases=['bsize'])
+    async def binarysize(self, ctx, *, val):
+        """Convert a filesize into a more readable """
+        await ctx.send(humanize.naturalsize(val, binary=True))
+
     # noinspection SpellCheckingInspection
     @humanize.command(aliases=['fraction', 'frac', 'fra'])
     async def fractional(self, ctx, *, val):
