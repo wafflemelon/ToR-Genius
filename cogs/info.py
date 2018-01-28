@@ -51,7 +51,7 @@ class Info:
     @commands.command()
     async def joined(self, ctx, member: commands.MemberConverter=None):
         member = member or ctx.author
-        await ctx.send(f'{member.display_name} joined  '
+        await ctx.send(f'{member.display_name} joined '
                        f'{format_time(member.joined_at)}')
 
 
