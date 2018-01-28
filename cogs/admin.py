@@ -48,8 +48,8 @@ async def run_subprocess(cmd, loop=None):
 
 async def haste_upload(text):
     with aiohttp.ClientSession() as session:
-        async with session.post("https://hastebin.com/documents/", data=text,
-                                headers={"Content-Type": "text/plain"}) as r:
+        async with session.post('https://hastebin.com/documents/', data=text,
+                                headers={'Content-Type': 'text/plain'}) as r:
             r = await r.json()
             return r['key']
 

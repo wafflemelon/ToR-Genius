@@ -1,5 +1,6 @@
 import itertools
 
+import aiohttp
 import discord
 import wolframalpha
 from discord.ext import commands
@@ -79,6 +80,15 @@ class Search:
             p = EmbedPages(ctx, embeds=embed_images)
             await p.paginate()
 
+    @commands.command()
+    async def quick(self, ctx, *, query):
+        with aiohttp.ClientSession() as s:
+            async with s.get(
+                    'https://api.wolframalpha.com/v2/result',
+                    params={'i': query, 'appid': config.wolfram}
+            ) as res:
+                text = await res.text()
+                await ctx.send(text)
 
 def setup(bot):
     bot.add_cog(Search(bot))
