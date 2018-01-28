@@ -29,6 +29,7 @@ class Search:
     @commands.command()
     @commands.cooldown(rate=1, per=20, type=commands.BucketType.user)
     async def wolfram(self, ctx, *, query: str):
+        """Do a full wolframalpha query, with a very verbose response."""
         await ctx.channel.trigger_typing()
 
         client = wolframalpha.Client(config.wolfram)
@@ -82,6 +83,7 @@ class Search:
 
     @commands.command()
     async def quick(self, ctx, *, query):
+        """Do a quick wolframalpha query, with a short response"""
         await ctx.channel.trigger_typing()
         with aiohttp.ClientSession() as s:
             async with s.get(

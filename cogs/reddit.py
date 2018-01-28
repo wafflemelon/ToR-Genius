@@ -341,7 +341,8 @@ FROM reddit_config;
 
     @commands.group(invoke_without_command=True)
     async def gammas(self, ctx, *, user: RedditAccountConverter = None):
-        user = await RedditMember.create(ctx, ctx.author) if not user else user
+        """Get the number of gammas from a user"""
+        user = user or await RedditMember.create(ctx, ctx.author)
 
         r_user = ctx.r.redditor(user.reddit)
 

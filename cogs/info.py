@@ -29,8 +29,9 @@ class Info:
     @commands.command(aliases=['perms'])
     async def permissions(self, ctx, member: commands.MemberConverter = None, *,
                           channel: commands.TextChannelConverter = None):
-        channel = ctx.channel if not channel else channel
-        user = ctx.author if not member else member
+        """Get the permissions of a member in a certain channel"""
+        channel = channel or ctx.channel
+        user = member or ctx.author
 
         perms = user.permissions_in(channel)
 
@@ -50,6 +51,7 @@ class Info:
     # noinspection PyUnresolvedReferences
     @commands.command()
     async def joined(self, ctx, member: commands.MemberConverter=None):
+        """Find out concisely when a member joined."""
         member = member or ctx.author
         await ctx.send(f'{member.display_name} joined '
                        f'{format_time(member.joined_at)}')
