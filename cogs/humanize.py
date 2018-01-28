@@ -56,7 +56,7 @@ class Humanize:
 
     @humanize.command(aliases=['bsize'])
     async def binarysize(self, ctx, *, val):
-        """Convert a filesize into a more readable """
+        """Convert a filesize into a more human readable binary filesize"""
         await ctx.send(humanize.naturalsize(val, binary=True))
 
     # noinspection SpellCheckingInspection
