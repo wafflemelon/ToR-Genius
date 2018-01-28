@@ -6,6 +6,7 @@ from discord.ext import commands
 from texttable import Texttable, ArraySizeError
 
 import config
+from cogs.admin import haste_upload
 from cogs.utils.paginator import EmbedPages
 
 
@@ -59,13 +60,19 @@ class Search:
                 )
             ))
             if to_send != '':
-                await ctx.send(to_send)
+                try:
+                    await ctx.send(to_send)
+                except discord.HTTPException:
+                    haste_upload(to_send + '\n' + '\n'.join(images))
             if embed_images:
                 p = EmbedPages(ctx, embeds=embed_images)
                 await p.paginate()
             return
 
-        await ctx.send(code_block(t.draw()))
+        try:
+            await ctx.send(code_block(t.draw()))
+        except discord.HTTPException:
+            haste_upload(code_block(t.draw()))
         if embed_images:
             p = EmbedPages(ctx, embeds=embed_images)
             await p.paginate()
