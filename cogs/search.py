@@ -82,6 +82,7 @@ class Search:
 
     @commands.command()
     async def quick(self, ctx, *, query):
+        await ctx.channel.trigger_typing()
         with aiohttp.ClientSession() as s:
             async with s.get(
                     'https://api.wolframalpha.com/v2/result',
