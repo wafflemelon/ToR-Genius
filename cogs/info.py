@@ -1,5 +1,20 @@
+from datetime import datetime
+
 import discord
+import humanize as humanize
 from discord.ext import commands
+
+# following is from
+# https://github.com/khazhyk/dango.py/blob/master/plugins/info.py
+# Discord epoch
+UNKNOWN_CUTOFF = datetime.utcfromtimestamp(1420070400.000)
+
+
+def format_time(time):
+    if time is None or time < UNKNOWN_CUTOFF:
+        return "Unknown"
+    return "{} ({} UTC)".format(
+        humanize.naturaltime(time + (datetime.now() - datetime.utcnow())), time)
 
 
 class Info:
@@ -31,6 +46,13 @@ class Info:
         )
 
         await ctx.send(embed=e)
+
+    # noinspection PyUnresolvedReferences
+    @commands.command()
+    async def joined(self, ctx, member: commands.MemberConverter=None):
+        member = member or ctx.author
+        await ctx.send(f'{member.display_name} joined  '
+                       f'{format_time(member.joined_at)}')
 
 
 def setup(bot):
