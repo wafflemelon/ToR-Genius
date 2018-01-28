@@ -93,5 +93,6 @@ class Search:
                 text = await res.text()
                 await ctx.send(text)
 
+
 def setup(bot):
     bot.add_cog(Search(bot))

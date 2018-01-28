@@ -34,7 +34,8 @@ initial_extensions = [
     'cogs.info',
     'cogs.other',
     'cogs.discrim',
-    'cogs.search'
+    'cogs.search',
+    'cogs.humanize'
 ]
 
 
