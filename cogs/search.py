@@ -2,6 +2,7 @@ import itertools
 
 import aiohttp
 import discord
+import wikipedia
 import wolframalpha
 from discord.ext import commands
 from texttable import Texttable, ArraySizeError
@@ -92,6 +93,28 @@ class Search:
             ) as res:
                 text = await res.text()
                 await ctx.send(text)
+
+    @commands.command(aliases=['wiki'])
+    async def wikipedia(self, ctx, *, query: str):
+        """Search wikipedia for a page"""
+        pages = wikipedia.search(query)
+        page = wikipedia.page(pages[0])
+        # space after colon because Discord sucks
+        response = f'From <{page.url}>:\n\n'
+        response += (page.summary[:1750] + "...") \
+            if len(page.summary) > 1750 else page.summary
+
+        if len(pages) > 1:
+            response += f'\n\nOther possibilities:\n'
+            other_results = pages[1:min(len(pages), 3)]
+            for resp in other_results:
+                response += \
+                    f'**{resp}**: {wikipedia.summary(resp, sentences=1)}'
+
+        try:
+            await ctx.send(response)
+        except discord.HTTPException:
+            await ctx.send(page.url)
 
 
 def setup(bot):

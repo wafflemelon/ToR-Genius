@@ -90,7 +90,7 @@ class Reddit:
         if isinstance(error, BadArgument):
             await ctx.send(error)
 
-    @commands.command(name='wiki')
+    @commands.command(name='rwiki')
     async def reddit_wiki_page(self, ctx, *, search: str = None):
         """Search the wiki pages on r/ToR for something."""
         sub = ctx.r.subreddit('transcribersofreddit')
