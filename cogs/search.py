@@ -96,6 +96,7 @@ class Search:
     @commands.command(aliases=['wiki'])
     async def wikipedia(self, ctx, *, query: str):
         """Search wikipedia for a page"""
+        await ctx.channel.trigger_typing()
         pages = wikipedia.search(query)
         page = wikipedia.page(pages[0])
         # space after colon because Discord sucks
@@ -108,7 +109,7 @@ class Search:
             other_results = pages[1:min(len(pages), 3)]
             for resp in other_results:
                 response += \
-                    f'**{resp}**: {wikipedia.summary(resp, sentences=1)}'
+                    f'**{resp}**: {wikipedia.summary(resp, sentences=1)}\n'
 
         try:
             await ctx.send(response)
@@ -118,6 +119,8 @@ class Search:
     # noinspection SpellCheckingInspection
     @commands.command(aliases=['ddg', 'duck', 'google', 'goog'])
     async def duckduckgo(self, ctx, *, query: str):
+        """Search the DuckDuckGo IA API"""
+        await ctx.channel.trigger_typing()
         with aiohttp.ClientSession() as s:
             async with s.get(
                     'https://api.duckduckgo.com',
