@@ -56,7 +56,6 @@ class Search:
         try:
             t.add_rows(data)
         except ArraySizeError:
-            # to_send = code_block('\n\n'.join([s.text for s in res.results]))
             to_send = code_block('\n\n'.join(
                 itertools.chain.from_iterable(
                     data
@@ -115,6 +114,82 @@ class Search:
             await ctx.send(response)
         except discord.HTTPException:
             await ctx.send(page.url)
+
+    # noinspection SpellCheckingInspection
+    @commands.command(aliases=['ddg', 'duck', 'google', 'goog'])
+    async def duckduckgo(self, ctx, *, query: str):
+        with aiohttp.ClientSession() as s:
+            async with s.get(
+                    'https://api.duckduckgo.com',
+                    params={'q': query, 't': 'ToR Genius Discord Bot',
+                            'format': 'json', 'no_html': '1'}
+            ) as res:
+                resp_json = await res.json(
+                    content_type='application/x-javascript'
+                )
+                embeds = {}
+
+                if resp_json['AbstractURL'] != '':
+                    embeds[f'Abstract: {resp_json["Heading"]}'
+                           f' ({resp_json["AbstractSource"]})'] = {
+                        'image': resp_json['Image'],
+                        'desc': f'{resp_json.get("AbstractText", "")}\n\n'
+                                f'{resp_json["AbstractURL"]}'
+                    }
+
+                if resp_json['Definition'] != '':
+                    embeds['Definition'] = {
+                        'desc': f'{resp_json["Definition"]}\n'
+                                f'([{resp_json["DefinitionSource"]}]'
+                                f'({resp_json["DefinitionURL"]}))'
+                    }
+
+                if resp_json['RelatedTopics']:
+                    desc = []
+                    for topic in resp_json['RelatedTopics']:
+                        try:
+                            if len('\n'.join(desc)) > 1000:
+                                break
+                            desc.append(
+                                f'[**{topic["Text"]}**]({topic["FirstURL"]})'
+                            )
+                        except KeyError:
+                            # some weird subtopic thing I guess
+                            continue
+
+                    embeds['Related'] = {
+                        'desc': '\n'.join(desc),
+                        'image': resp_json['RelatedTopics'][0]['Icon']['URL']
+                    }
+
+                if resp_json['Results']:
+                    desc = []
+                    for result in resp_json['Results']:
+                        desc.append(
+                            f'[**{result["Text"]}**]({result["FirstURL"]})'
+                        )
+                    embeds['Top Results'] = {
+                        'desc': '\n'.join(desc),
+                        'image': resp_json['Results'][0]['Icon']['URL']
+                    }
+
+                final_embeds = []
+
+                for embed_title, embed_content in embeds.items():
+                    final_embeds.append(
+                        discord.Embed(
+                            title=embed_title,
+                            description=embed_content['desc'],
+                            color=ctx.author.top_role.color
+                        ).set_image(
+                            url=embed_content['image']
+                        ).set_thumbnail(
+                            url='https://i.imgur.com/CVogaGL.png'
+                        )
+                    )
+
+                p = EmbedPages(ctx, embeds=final_embeds)
+                await p.paginate()
 
 
 def setup(bot):
