@@ -1,5 +1,3 @@
-import random
-
 import aiohttp
 from discord.ext import commands
 
@@ -54,32 +52,6 @@ class Other:
                 )
 
                 await p.paginate()
-
-    @commands.command(aliases=['git', 'joke'])
-    async def git_jokes(self, ctx, query=None):
-        await ctx.channel.trigger_typing()
-        async with aiohttp.ClientSession() as s:
-            async with s.get('https://raw.githubusercontent.com/EugeneKay/'
-                             'git-jokes/lulz/Jokes.txt') as res:
-                content = await res.text()
-                jokes = content.splitlines()
-                if not query:
-                    return await ctx.send(random.choice(jokes))
-                try:
-                    return await ctx.send(jokes[int(query)-1])
-                except (IndexError, ValueError):
-                    # shuffle in case it's a short search so you don't
-                    # always get the same results
-                    random.shuffle(jokes)
-                    result = None
-                    for joke in jokes:
-                        if query.lower() in joke.lower():
-                            result = joke
-
-                    if result is None:
-                        return await ctx.send('No results found.')
-                    else:
-                        await ctx.send(result)
 
 
 def setup(bot):
