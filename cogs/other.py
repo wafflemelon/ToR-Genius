@@ -65,16 +65,18 @@ class Other:
             async with sess.get(url) as r:
                 return io.BytesIO(await r.read())
 
-    # noinspection PyUnresolvedReferences
+    # noinspection PyUnresolvedReferences,PyPep8Naming
     @commands.command()
     async def blame(self, ctx, *, member: commands.MemberConverter = None):
         """Blame everyone! Defaults to perryprog."""
         # hardcoded because I want to be blamed even in forks ;)
         member = member or self.bot.get_user(280001404020588544)
-        if member is None:
+        if not member:
             return await ctx.send("No user specified, and owner couldn't "
                                   "be found")
 
+        # special cases for usernames and avatars for people with
+        # default avatars
         special_cases = {
             'names': {
                 'perryprog': 'perry',
@@ -104,24 +106,31 @@ class Other:
         img = Image.open(img)
         img = img.convert('RGBA')
 
-        large_image = Image.new('RGBA', [3 * x for x in img.size], (0, 0, 0, 0))
-        box = (img.size[0], img.size[0], img.size[0] * 2, img.size[0] * 2)
+        # make the image 3 times larger than the avatar
+        large_image = Image.new('RGBA', [3 * x for x in img.size], (0,)*4)
+        lW, lH = large_image.size
+        W, H = img.size
+        # the center box for the avatar
+        box = (W, W, W * 2, W * 2)
 
+        # make the emoji 20% bigger than the avatar
         emoji = emoji.resize([floor(x * 1.2) for x in img.size])
+        eW, eH = emoji.size
 
         large_image.paste(img.copy(), box)
         large_image.paste(
             emoji,
 
-            (
-                floor((large_image.size[0] - emoji.size[0]) / 2),
+            (  # center the emoji
+                floor((lW - eW) / 2),
 
-                floor((large_image.size[1] - emoji.size[1]) / 2)
+                floor((lH - eH) / 2)
             ),
 
             emoji
         )
 
+        # make the font size relative to the avatar size
         fnt = ImageFont.truetype('Arial.ttf', floor(img.size[0] / 4))
         d = ImageDraw.Draw(large_image)
 
@@ -131,12 +140,15 @@ class Other:
             name = special_cases['names'][member.name]
 
         message = f'#blame{name}'
-        w, h = d.textsize(message, fnt)
+        tW, tH = d.textsize(message, fnt)
 
         d.text(
-            (
-                floor((large_image.size[0] - w) / 2),
-                floor(img.size[1] / 2) - floor(img.size[0] / 4)),
+            (  # center the text
+                floor((lW - tW) / 2),
+                # make the text somewhat centered (a bit offset so it
+                # looks good) in the first "row"
+                floor(H / 2) - floor(W / 4)
+            ),
             message,
             font=fnt,
             fill=(255,) * 4
