@@ -151,7 +151,7 @@ ON CONFLICT (user_id)
     async def list(self, ctx, search: str = ''):
         """List all possible timezones, with an optional search string."""
 
-        entries = [t for t in pytz.all_timezones if search in t.lower()]
+        entries = [t for t in pytz.all_timezones if search.lower() in t.lower()]
         if not entries:
             return await ctx.send('No results found. Sorry!')
         p = Pages(ctx, entries=entries)
