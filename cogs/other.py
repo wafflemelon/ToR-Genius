@@ -110,7 +110,7 @@ class Other:
         d = ImageDraw.Draw(large_image)
 
         # noinspection PyUnresolvedReferences
-        name = re.sub(r'\W', '', member.username).lower()
+        name = re.sub(r'\W', '', member.name).lower()
         message = f'#blame{name}'
         w, h = d.textsize(message, fnt)
 
