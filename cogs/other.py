@@ -68,6 +68,7 @@ class Other:
     # noinspection PyUnresolvedReferences
     @commands.command()
     async def blame(self, ctx, *, member: commands.MemberConverter = None):
+        """Blame everyone! Defaults to perryprog."""
         # hardcoded because I want to be blamed even in forks ;)
         member = member or self.bot.get_user(280001404020588544)
         if member is None:
