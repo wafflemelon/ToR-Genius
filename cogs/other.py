@@ -65,6 +65,7 @@ class Other:
             async with sess.get(url) as r:
                 return io.BytesIO(await r.read())
 
+    # noinspection PyUnresolvedReferences
     @commands.command()
     async def blame(self, ctx, *, member: commands.MemberConverter = None):
         # hardcoded because I want to be blamed even in forks ;)
@@ -73,6 +74,17 @@ class Other:
             return await ctx.send("No user specified, and owner couldn't "
                                   "be found")
 
+        special_cases = {
+            'names': {
+                'perryprog': 'perry',
+                'itsthejoker': 'joker'
+            },
+            'avatars': {
+                'itsthejoker': 'https://avatars0.githubusercontent.com'
+                               '/u/5179553'
+            }
+        }
+
         # :no_entry: emoji
         emoji = 'https://emojipedia-us.s3.amazonaws.com/thumbs/240/twitter/' \
                 '120/no-entry-sign_1f6ab.png'
@@ -80,9 +92,12 @@ class Other:
         emoji = Image.open(emoji)
         emoji = emoji.convert('RGBA')
 
-        # noinspection PyUnresolvedReferences
-        url = member.avatar_url_as(format='png')
-        url = url.replace('gif', 'png').strip('<>')
+        if member.name not in special_cases['avatars']:
+            url = member.avatar_url_as(format='png')
+            url = url.replace('gif', 'png').strip('<>')
+        else:
+            url = special_cases['avatars'][member.name]
+
         img = await self.download(url)
 
         img = Image.open(img)
@@ -109,8 +124,11 @@ class Other:
         fnt = ImageFont.truetype('Arial.ttf', floor(img.size[0] / 4))
         d = ImageDraw.Draw(large_image)
 
-        # noinspection PyUnresolvedReferences
-        name = re.sub(r'\W', '', member.name).lower()
+        if member.name not in special_cases['names'].keys():
+            name = re.sub(r'\W', '', member.name).lower()
+        else:
+            name = special_cases['names'][member.name]
+
         message = f'#blame{name}'
         w, h = d.textsize(message, fnt)
 
