@@ -90,7 +90,7 @@ class Discrim:
             ])
         elif selector == '<':
             p = Pages(ctx, entries=[
-                'f{u.display_name}#{u.discriminator}'
+                f'{u.display_name}#{u.discriminator}'
                 for u in ctx.guild.members
                 if int(u.discriminator) < discriminator
             ])
