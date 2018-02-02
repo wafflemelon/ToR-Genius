@@ -47,11 +47,25 @@ async def run_subprocess(cmd, loop=None):
 
 
 async def haste_upload(text):
+    text = str(text)
     with aiohttp.ClientSession() as session:
         async with session.post('https://hastebin.com/documents/', data=text,
                                 headers={'Content-Type': 'text/plain'}) as r:
             r = await r.json()
             return r['key']
+
+
+async def gist_upload(files, public=False, description=''):
+    description = str(description)
+    data = {
+        'description': description,
+        'public': public,
+        'files': files
+    }
+    with aiohttp.ClientSession() as session:
+        async with session.post('https://api.github.com/gists', json=data) as r:
+            json = await r.json()
+            return json['html_url']
 
 
 class Admin:
@@ -109,8 +123,8 @@ class Admin:
         try:
             await ctx.send(out if out else ":ok_hand:")
         except discord.HTTPException:
-            key = await haste_upload(out)
-            await ctx.send(f'https://hastebin.com/{key}')
+            key = await gist_upload({'out.sh': {'content': out}})
+            await ctx.send(key)
 
     @commands.command(hidden=True)
     async def load(self, ctx, *, module):
@@ -204,15 +218,19 @@ class Admin:
                     try:
                         await ctx.send(f'```py\n{value}\n```')
                     except discord.HTTPException:
-                        key = await haste_upload(value)
-                        await ctx.send(f'https://hastebin.com/{key}')
+                        key = await gist_upload(
+                            {'in.py': {'content': to_compile},
+                             'out.py': {'content': value}})
+                        await ctx.send(key)
             else:
                 self._last_result = ret
                 try:
                     await ctx.send(f'```py\n{value}{ret}\n```')
                 except discord.HTTPException:
-                    key = await haste_upload(value + ret)
-                    await ctx.send(f'https://hastebin.com/{key}')
+                    key = await gist_upload({'in.py': {'content': to_compile},
+                                             'out.py': {
+                                                 'content': value + ret}})
+                    await ctx.send(key)
 
     @commands.command(pass_context=True, hidden=True)
     async def calc(self, ctx, *, body: str):
@@ -267,15 +285,19 @@ class Admin:
                     try:
                         await ctx.send(f'```py\n{value}\n```')
                     except discord.HTTPException:
-                        key = await haste_upload(value)
-                        await ctx.send(f'https://hastebin.com/{key}')
+                        key = await gist_upload(
+                            {'in.py': {'content': to_compile},
+                             'out.py': {'content': value}})
+                        await ctx.send(key)
             else:
                 self._last_result = ret
                 try:
                     await ctx.send(f'```py\n{value}{ret}\n```')
                 except discord.HTTPException:
-                    key = await haste_upload(value + ret)
-                    await ctx.send(f'https://hastebin.com/{key}')
+                    key = await gist_upload({'in.py': {'content': to_compile},
+                                             'out.py': {
+                                                 'content': value + ret}})
+                    await ctx.send(key)
 
     @commands.command(pass_context=True, hidden=True)
     async def repl(self, ctx):
