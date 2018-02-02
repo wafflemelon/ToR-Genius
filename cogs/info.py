@@ -42,7 +42,7 @@ class Info:
 
         e = discord.Embed(
             description='\n'.join(desc),
-            color=user.top_role.color,
+            color=user.color,
             title=f'Permissions for {user.display_name}'
         )
 

@@ -96,7 +96,7 @@ class Reddit:
         sub = ctx.r.subreddit('transcribersofreddit')
         if not search:
             embed = discord.Embed(
-                color=ctx.author.top_role.color,
+                color=ctx.author.color,
                 description='[ToR Wiki](https://www.reddit.com/'
                             'r/TranscribersOfReddit/wiki/index)'
             )
@@ -115,7 +115,7 @@ class Reddit:
 
         if results is not []:
             p = Pages(ctx, entries=results)
-            p.embed.color = ctx.author.top_role.color
+            p.embed.color = ctx.author.color
             await p.paginate()
         else:
             await ctx.send("Couldn't find any results for that. Sorry! ):")

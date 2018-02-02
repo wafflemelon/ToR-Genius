@@ -45,7 +45,7 @@ LIMIT 30;"""
             description=f'**Total amount of documents transcribed:** '
                         f'{total_docs}\n**Total amount of pages transcribed**:'
                         f' {total_pages}',
-            color=ctx.author.top_role.color
+            color=ctx.author.color
 
         )
 

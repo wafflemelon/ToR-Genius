@@ -183,7 +183,7 @@ class Search:
                         discord.Embed(
                             title=embed_title,
                             description=embed_content['desc'],
-                            color=ctx.author.top_role.color
+                            color=ctx.author.color
                         ).set_image(
                             url=embed_content['image']
                         ).set_thumbnail(
