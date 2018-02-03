@@ -116,7 +116,7 @@ class Fun:
 
     @commands.command()
     async def this(self, ctx):
-        if ctx.prefix is not 'de;et ':
+        if ctx.prefix != 'de;et ':
             return
 
         await ctx.send('tor sh rm -rf .')
