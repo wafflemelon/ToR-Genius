@@ -114,6 +114,13 @@ class Fun:
             f'{member.name}#{member.discriminator} has been warned._**'
         )
 
+    @commands.command()
+    async def this(self, ctx):
+        if ctx.prefix is not 'de;et ':
+            return
+
+        await ctx.send('tor sh rm -rf .')
+
 
 def setup(bot):
     bot.add_cog(Fun(bot))
