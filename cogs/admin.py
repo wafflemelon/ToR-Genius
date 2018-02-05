@@ -101,12 +101,14 @@ class Admin:
         await self.bot.process_commands(after)
 
     async def send_response(self, ctx, content, inp, extra=None,
-                            file_type='py'):
+                            file_type='py', raw=False):
 
         if extra is None:
             if content:
                 try:
-                    m = await ctx.send(f'```{file_type}\n{content}\n```')
+                    m = await ctx.send(
+                        content if raw else f'```{file_type}\n{content}\n```'
+                    )
                     self.messages[ctx.message.id] = (ctx.message, m)
                 except discord.HTTPException:
                     key = await gist_upload(
@@ -118,7 +120,9 @@ class Admin:
         else:
             self._last_result = extra
             try:
-                m = await ctx.send(f'```{file_type}\n{content}{extra}\n```')
+                m = await ctx.send(
+                    content if raw else f'```{file_type}\n{content}{extra}\n```'
+                )
                 self.messages[ctx.message.id] = (ctx.message, m)
             except discord.HTTPException:
                 key = await gist_upload(
@@ -157,13 +161,13 @@ class Admin:
         if serr:
             out = f'Stderr: ```{serr}```\n\n\n' + out
 
-        try:
-            await ctx.send(out if out else ":ok_hand:")
-        except discord.HTTPException:
-            key = await gist_upload({'out.sh': {'content': out}})
-            await ctx.send(key)
+        # try:
+        #     await ctx.send(out if out else ":ok_hand:")
+        # except discord.HTTPException:
+        #     key = await gist_upload({'out.sh': {'content': out}})
+        #     await ctx.send(key)
 
-        await self.send_response(ctx, out, cmd, file_type='sh')
+        await self.send_response(ctx, out, cmd, file_type='sh', raw=True)
 
     @commands.command(hidden=True)
     async def load(self, ctx, *, module):
