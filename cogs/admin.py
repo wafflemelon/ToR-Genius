@@ -238,7 +238,9 @@ class Admin:
         try:
             exec(to_compile, env)
         except SyntaxError as e:
-            return await ctx.send(self.format_error(e))
+            return await self.send_response(
+                ctx, self.format_error(e), None, raw=True
+            )
 
         func = env['func']
         # noinspection PyBroadException
@@ -247,7 +249,9 @@ class Admin:
                 ret = await func()
         except Exception:
             value = stdout.getvalue()
-            await ctx.send(f'```py\n{value}{traceback.format_exc()}\n```')
+            await self.send_response(
+                ctx, value, to_compile, extra=traceback.format_exc()
+            )
         else:
             value = stdout.getvalue()
             # noinspection PyBroadException
@@ -287,8 +291,10 @@ class Admin:
         # noinspection PyBroadException
         try:
             exec(to_compile, env)
-        except Exception as e:
-            return await ctx.send(f'```py\n{e.__class__.__name__}: {e}\n```')
+        except SyntaxError as e:
+            return await self.send_response(
+                ctx, self.format_error(e), None, raw=True
+            )
 
         func = env['func']
         # noinspection PyBroadException
@@ -297,7 +303,9 @@ class Admin:
                 ret = await func()
         except Exception:
             value = stdout.getvalue()
-            await ctx.send(f'```py\n{value}{traceback.format_exc()}\n```')
+            await self.send_response(
+                ctx, value, to_compile, extra=traceback.format_exc()
+            )
         else:
             value = stdout.getvalue()
             # noinspection PyBroadException
