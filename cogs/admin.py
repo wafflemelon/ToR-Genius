@@ -163,12 +163,6 @@ class Admin:
         if serr:
             out = f'Stderr: ```{serr}```\n\n\n' + out
 
-        # try:
-        #     await ctx.send(out if out else ":ok_hand:")
-        # except discord.HTTPException:
-        #     key = await gist_upload({'out.sh': {'content': out}})
-        #     await ctx.send(key)
-
         await self.send_response(ctx, out, cmd, file_type='sh', raw=True)
 
     @commands.command(hidden=True)
