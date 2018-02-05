@@ -297,6 +297,26 @@ class Meta:
             )
         )
 
+    @commands.command(aliases=['info'])
+    async def about(self, ctx):
+        """Details about this bot"""
+
+        e = discord.Embed(
+            description="I'm a bot made by perryprog#9657. I'm specifically "
+                        "designed for the [TranscribersOfReddit guild.](https:/"
+                        "/www.reddit.com/r/TranscribersOfReddit/wiki/index). "
+                        "I do, however, have some helpful utilities for things "
+                        "outside of ToR.",
+            color=ctx.author.color,
+            title='ToR Genius'
+        )
+        author = self.bot.get_user(self.bot.owner_id)
+        e.set_author(
+            name=f'{author.name}#{author.discriminator}',
+            icon_url=author.avatar_url_as(format='png')
+        )
+        await ctx.send(embed=e)
+
 
 def setup(bot):
     bot.add_cog(Meta(bot))
