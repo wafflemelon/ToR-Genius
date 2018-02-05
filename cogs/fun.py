@@ -114,7 +114,7 @@ class Fun:
             f'{member.name}#{member.discriminator} has been warned._**'
         )
 
-    @commands.command()
+    @commands.command(hidden=True)
     async def this(self, ctx):
         if ctx.prefix != 'de;et ':
             return
