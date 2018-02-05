@@ -92,6 +92,8 @@ class Admin:
         return content.strip('` \n')
 
     async def on_message_edit(self, before, after):
+        # Thanks 『 ᴺᵉᵏᵒ 』#0001 for the idea
+
         result = self.messages.get(before.id)
         if not result:
             return
