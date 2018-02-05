@@ -310,10 +310,12 @@ class Meta:
             color=ctx.author.color,
             title='ToR Genius'
         )
-        author = self.bot.get_user(self.bot.owner_id)
+
+        # blah blah hard coding is bad blah
         e.set_author(
-            name=f'{author.name}#{author.discriminator}',
-            icon_url=author.avatar_url_as(format='png')
+            name=f'perryprog#9657',
+            icon_url='https://images.discordapp.net/avatars/280001404020588544'
+                     '/d958e37f81f45a2d18289c64112cfe22.png?size=1024'
         )
         await ctx.send(embed=e)
 
