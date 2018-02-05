@@ -75,6 +75,7 @@ class Admin:
         self.bot = bot
         self._last_result = None
         self.sessions = set()
+        self.messages = {}
 
     @staticmethod
     def cleanup_code(content):
@@ -89,6 +90,42 @@ class Admin:
 
         # remove `foo`
         return content.strip('` \n')
+
+    async def on_message_edit(self, before, after):
+        result = self.messages.get(before.id)
+        if not result:
+            return
+
+        trigger, resp = result
+        await resp.delete()
+        await self.bot.process_commands(after)
+
+    async def send_response(self, ctx, content, inp, extra=None,
+                            file_type='py'):
+
+        if extra is None:
+            if content:
+                try:
+                    m = await ctx.send(f'```{file_type}\n{content}\n```')
+                    self.messages[ctx.message.id] = (ctx.message, m)
+                except discord.HTTPException:
+                    key = await gist_upload(
+                        {f'in.{file_type}': {'content': inp},
+                         f'out.{file_type}': {'content': content}})
+                    m = await ctx.send(key)
+                    self.messages[ctx.message.id] = (ctx.message, m)
+
+        else:
+            self._last_result = extra
+            try:
+                m = await ctx.send(f'```{file_type}\n{content}{extra}\n```')
+                self.messages[ctx.message.id] = (ctx.message, m)
+            except discord.HTTPException:
+                key = await gist_upload(
+                    {f'in.{file_type}': {'content': inp},
+                     f'out.{file_type}': {'content': content + extra}})
+                m = await ctx.send(key)
+                self.messages[ctx.message.id] = (ctx.message, m)
 
     async def __local_check(self, ctx):
         k = await self.bot.is_owner(ctx.author)
@@ -125,6 +162,8 @@ class Admin:
         except discord.HTTPException:
             key = await gist_upload({'out.sh': {'content': out}})
             await ctx.send(key)
+
+        await self.send_response(ctx, out, cmd, file_type='sh')
 
     @commands.command(hidden=True)
     async def load(self, ctx, *, module):
@@ -213,24 +252,7 @@ class Admin:
             except BaseException:
                 pass
 
-            if ret is None:
-                if value:
-                    try:
-                        await ctx.send(f'```py\n{value}\n```')
-                    except discord.HTTPException:
-                        key = await gist_upload(
-                            {'in.py': {'content': to_compile},
-                             'out.py': {'content': value}})
-                        await ctx.send(key)
-            else:
-                self._last_result = ret
-                try:
-                    await ctx.send(f'```py\n{value}{ret}\n```')
-                except discord.HTTPException:
-                    key = await gist_upload({'in.py': {'content': to_compile},
-                                             'out.py': {
-                                                 'content': value + ret}})
-                    await ctx.send(key)
+            await self.send_response(ctx, value, to_compile, extra=ret)
 
     @commands.command(pass_context=True, hidden=True)
     async def calc(self, ctx, *, body: str):
@@ -280,24 +302,7 @@ class Admin:
             except:
                 pass
 
-            if ret is None:
-                if value:
-                    try:
-                        await ctx.send(f'```py\n{value}\n```')
-                    except discord.HTTPException:
-                        key = await gist_upload(
-                            {'in.py': {'content': to_compile},
-                             'out.py': {'content': value}})
-                        await ctx.send(key)
-            else:
-                self._last_result = ret
-                try:
-                    await ctx.send(f'```py\n{value}{ret}\n```')
-                except discord.HTTPException:
-                    key = await gist_upload({'in.py': {'content': to_compile},
-                                             'out.py': {
-                                                 'content': value + ret}})
-                    await ctx.send(key)
+            await self.send_response(ctx, value, to_compile, extra=ret)
 
     @commands.command(pass_context=True, hidden=True)
     async def repl(self, ctx):
