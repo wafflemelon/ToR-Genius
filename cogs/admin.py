@@ -105,9 +105,9 @@ class Admin:
     async def send_response(self, ctx, content, inp, extra=None,
                             file_type='py', raw=False):
 
-        content = str(content) if content else None
-        inp = str(inp) if inp else None
-        extra = str(extra) if extra else None
+        content = str(content) if content is not None else None
+        inp = str(inp) if inp is not None else None
+        extra = str(extra) if extra is not None else None
 
         if extra is None:
             if content:
