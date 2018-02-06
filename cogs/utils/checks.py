@@ -63,8 +63,6 @@ def tor_only():
 
         ok = ctx.guild.id in [318873523579781132, 369960111679995905]
         if not ok:
-            # await ctx.send('This command only works on the ToR Discord so '
-            #                'far. It\'ll work on all servers soon though!')
             return False
 
         return True

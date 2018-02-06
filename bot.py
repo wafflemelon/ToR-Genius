@@ -103,6 +103,8 @@ class TorGenius(commands.Bot):
                 f'{error.original.__class__.__name__}: {error.original}',
                 file=sys.stderr
             )
+        elif isinstance(error, commands.CheckFailure):
+            await ctx.send('You are not allowed to use this command.')
 
     def get_guild_prefixes(self, guild):
         # top kek (https://github.com/Rapptz/RoboDanny/blob/rewrite/bot.py#L87)
