@@ -105,6 +105,10 @@ class Admin:
     async def send_response(self, ctx, content, inp, extra=None,
                             file_type='py', raw=False):
 
+        if extra:
+            self._last_result = extra
+
+
         content = str(content) if content is not None else None
         inp = str(inp) if inp is not None else None
         extra = str(extra) if extra is not None else None
@@ -124,7 +128,6 @@ class Admin:
                     self.messages[ctx.message.id] = (ctx.message, m)
 
         else:
-            self._last_result = extra
             try:
                 m = await ctx.send(
                     content if raw else f'```{file_type}\n{content}{extra}\n```'
