@@ -35,6 +35,8 @@ class Meta:
     async def __error(ctx, error):
         if isinstance(error, commands.BadArgument):
             await ctx.send(error)
+        if isinstance(error, commands.CommandOnCooldown):
+            await ctx.send(error)
 
     @commands.command(name='help', aliases=['halp'])
     async def _help(self, ctx, *, command: str = None):
