@@ -305,7 +305,7 @@ class Meta:
 
         e = discord.Embed(
             description="I'm a bot made by perryprog#9657. I'm specifically "
-                        "designed for the [TranscribersOfReddit guild.](https:/"
+                        "designed for the [TranscribersOfReddit guild](https:/"
                         "/www.reddit.com/r/TranscribersOfReddit/wiki/index). "
                         "I do, however, have some helpful utilities for things "
                         "outside of ToR.",
