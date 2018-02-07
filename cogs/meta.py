@@ -261,10 +261,10 @@ class Meta:
     @commands.command()
     async def source(self, ctx, *, command: str = None):
         """
-        Displays my full source code or for a specific command.
+        Displays the full source code or the source code for a specific command.
         To display the source code of a subcommand you can separate it by
-        periods, e.g. tag.create for the create subcommand of the tag command
-        or by spaces.
+        periods or spaces, e.g. `prefix.add` or `prefix add` for the create
+        subcommand of the tag command.
         """
         source_url = 'https://github.com/perryprog/tor-genius'
         if command is None:

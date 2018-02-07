@@ -37,7 +37,8 @@ initial_extensions = [
     'cogs.search',
     'cogs.humanize',
     'cogs.jokes',
-    'cogs.bostonlib'
+    'cogs.bostonlib',
+    'cogs.custom'
 ]
 
 
