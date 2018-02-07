@@ -73,6 +73,7 @@ class TorGenius(commands.Bot):
                           'lauye9r v7&^*^*111', 'no', 'no u', 'farts r funny']
 
         self.add_command(self.do)
+        self.token = 'A dead meme'
 
         self.prefixes = Config('prefixes.json')
 

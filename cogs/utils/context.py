@@ -32,6 +32,7 @@ class Context(commands.Context):
         super().__init__(**kwargs)
         self.pool = self.bot.pool
         self.db = None
+        self.token = 'A dead meme'
 
         self.r = praw.Reddit('main', user_agent='ToR Discord Bot')
 
