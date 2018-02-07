@@ -6,6 +6,7 @@
 # This copyright template is copied from @iwearapot#5464
 
 
+import asyncio
 import copy
 import logging
 import random
@@ -48,7 +49,7 @@ def _prefix(bot, msg):
     base = [f'<@{user_id}> ', f'<@!{user_id}> ']
 
     if msg.guild is None:
-        base.append('-')
+        base.extend(['-', ';', 'tor ', ''])
     else:
         base.extend(bot.prefixes.get(msg.guild.id, ['-']))
 
@@ -156,6 +157,15 @@ class TorGenius(commands.Bot):
 
         async with ctx.acquire(ctx, None):
             await self.invoke(ctx)
+
+    async def get_prefix(self, message):
+        prefix = ret = self.command_prefix
+        if callable(prefix):
+            ret = prefix(self, message)
+            if asyncio.iscoroutine(ret):
+                ret = await ret
+
+        return ret
 
     async def on_message(self, message):
         if message.author.bot:
