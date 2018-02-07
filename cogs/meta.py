@@ -186,7 +186,7 @@ class Meta:
         )
 
     @commands.command(aliases=['fb'])
-    @commands.cooldown(rate=1, per=5, type=commands.BucketType.user)
+    @commands.cooldown(rate=1, per=2*60, type=commands.BucketType.user)
     async def feedback(self, ctx, *, body: str):
         """PM the owner with feedback, questions and more.
 
