@@ -244,7 +244,7 @@ class Meta:
 
         content = content + '\n\nThis DM is in response to your recent ' \
                             'feedback. If you want to reply, make sure you ' \
-                            'use the `!feedback` command again. (One use ' \
+                            'use the `feedback` command again. (One use ' \
                             'every two minutes) '
 
         # noinspection PyBroadException
@@ -302,7 +302,7 @@ class Meta:
         """Details about this bot"""
 
         e = discord.Embed(
-            description="testing4 I'm a bot made by perryprog#9657. I'm specifically "
+            description="I'm a bot made by perryprog#9657. I'm specifically "
                         "designed for the [TranscribersOfReddit guild.](https:/"
                         "/www.reddit.com/r/TranscribersOfReddit/wiki/index). "
                         "I do, however, have some helpful utilities for things "
