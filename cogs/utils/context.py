@@ -3,6 +3,7 @@
 #
 # Licensed under the MIT License. https://opensource.org/licenses/MIT
 import asyncio
+from collections import namedtuple
 
 import praw
 from discord.ext import commands
@@ -33,6 +34,13 @@ class Context(commands.Context):
         self.pool = self.bot.pool
         self.db = None
         self.token = 'A dead meme'
+        self.emojis = namedtuple(
+            'Emojis', 'check xmark white_check cross_mark tick_yes')\
+            ('<:check:411592769308721153>',
+             '<:xmark:411592769619099658>',
+             '\N{WHITE HEAVY CHECK MARK}',
+             '\N{CROSS MARK}',
+             '<:tickYes:404815005423501313>')
 
         self.r = praw.Reddit('main', user_agent='ToR Discord Bot')
 
@@ -110,46 +118,47 @@ class Context(commands.Context):
             )
             return None
 
-        fmt = f'{message}\n\nReact with \N{WHITE HEAVY CHECK MARK} to ' \
-              f'confirm or \N{CROSS MARK} to deny.'
+        fmt = f'{message}\n\nReact with {self.emojis.check} to ' \
+              f'confirm or {self.emojis.xmark} to deny.'
 
         author_id = author_id or self.author.id
         msg = await self.send(fmt)
 
         confirm = None
 
-        def check(e, message_id, channel_id, user_id):
+        def check(reaction, user):
             nonlocal confirm
 
-            # ugly but idc
-            if needs_mod and not self.guild.get_channel(
-                    channel_id).permissions_for(
-                    self.guild.get_member(user_id).ban_members is True):
+            # bad bot
+            if user.bot:
                 return False
 
-            if message_id != msg.id or user_id != author_id:
+            if needs_mod and reaction.message.channel.permissions_for(
+                    user).ban_members is False:
                 return False
 
-            code_point = str(e)
+            if reaction.message.id != msg.id:
+                if not needs_mod and user.id != author_id:
+                    return False
 
-            if code_point == '\N{WHITE HEAVY CHECK MARK}':
+            if str(reaction) == self.emojis.tick_yes:
                 confirm = True
                 return True
-            elif code_point == '\N{CROSS MARK}':
+            elif str(reaction) == self.emojis.xmark:
                 confirm = False
                 return True
 
             return False
 
-        for emoji in ('\N{WHITE HEAVY CHECK MARK}', '\N{CROSS MARK}'):
-            await msg.add_reaction(emoji)
+        for emoji in (self.emojis.tick_yes, self.emojis.xmark):
+            await msg.add_reaction(emoji.strip('<:>'))
 
         if reacquire:
             await self.release()
 
         try:
             await self.bot.wait_for(
-                'raw_reaction_add',
+                'reaction_add',
                 check=check,
                 timeout=timeout
             )

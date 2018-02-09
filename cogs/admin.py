@@ -254,7 +254,7 @@ class Admin:
             value = stdout.getvalue()
             # noinspection PyBroadException
             try:
-                await ctx.message.add_reaction('✅')
+                await ctx.auto_react(ctx.emojis.check)
             except BaseException:
                 pass
 
@@ -308,7 +308,7 @@ class Admin:
             value = stdout.getvalue()
             # noinspection PyBroadException
             try:
-                await ctx.message.add_reaction('✅')
+                await ctx.auto_react(ctx.emojis.check)
             except:
                 pass
 

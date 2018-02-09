@@ -1,4 +1,3 @@
-import asyncio
 import random
 import re
 
@@ -158,56 +157,27 @@ ON CONFLICT (user_id)
 
             return
 
-        msg = await ctx.send(
+        msg = (
             'Mods: can you please check that this is correct. If so, react '
             'with :white_check_mark:. Otherwise, react with :no_entry_sign:.'
         )
 
-        await msg.add_reaction('✅')
-        await msg.add_reaction('🚫')
+        result = await ctx.prompt(
+            msg, timeout=10 * 60, needs_mod=True, reacquire=False
+        )
 
-        def check(r, u):
-            if r.message.id != msg.id:
-                return False
-
-            if u == self.bot.user:
-                return False
-
-            if self.bot.is_owner(u):
-                return True
-
-            if r.message.guild is None:
-                return False
-
-            if r.emoji not in ['✅', '🚫']:
-                return False
-
-            return r.message.channel.permissions_for(u).ban_members is True
-
-        try:
-            reaction, _ = await self.bot.wait_for(
-                'reaction_add',
-                timeout=600.0,
-                check=check
-            )
-
-            await reaction.message.delete()
-        except asyncio.TimeoutError:
+        if result is None:
             await ctx.send(
                 'Looks like a mod took too long to respond. Try again later :)'
             )
+        elif result is False:
+            await ctx.send('Sorry mate. A mod denied your request.')
         else:
-            if reaction.emoji == '🚫':
-                await ctx.send('Sorry mate. A mod denied your request.')
-                return
-
-            # has to be normal reaction now
-
             query = """
-INSERT INTO reddit_config (user_id, reddit_username) VALUES ($1, $2)
-ON CONFLICT (user_id)
-  DO UPDATE SET
-    reddit_username = EXCLUDED.reddit_username;"""
+            INSERT INTO reddit_config (user_id, reddit_username) VALUES ($1, $2)
+            ON CONFLICT (user_id)
+              DO UPDATE SET
+                reddit_username = EXCLUDED.reddit_username;"""
 
             await ctx.db.execute(query, ctx.author.id, username)
 
