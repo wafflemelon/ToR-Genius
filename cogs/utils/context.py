@@ -68,7 +68,7 @@ class Context(commands.Context):
     async def auto_react(self, emoji='👌'):
         # noinspection PyBroadException
         try:
-            await self.message.add_reaction(emoji)
+            await self.message.add_reaction(emoji.strip('<:>'))
         except:
             # No reaction perms probably
             await self.send(emoji)
