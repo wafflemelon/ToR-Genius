@@ -27,12 +27,8 @@ class CustomCommands:
         if isinstance(error, commands.BadArgument):
             await ctx.send(error)
 
-    async def __local_check(self, ctx):
-        k = await self.bot.is_owner(ctx.author)
-        return k
-
     @commands.group(aliases=['c'], invoke_without_command=True)
-    async def custom(self, ctx, name: CommandName):
+    async def custom(self, ctx, *, name: CommandName):
         """Basic tagging like thing just for me."""
         if name not in self.config:
             await ctx.send("That custom command doesn't exist")
@@ -40,6 +36,7 @@ class CustomCommands:
             await ctx.send(self.config[name])
 
     @custom.command(aliases=['a'])
+    @commands.is_owner()
     async def add(self, ctx, name: CommandName, *, content):
         """Add a custom command"""
         if name in self.config:
@@ -50,6 +47,7 @@ class CustomCommands:
         await ctx.auto_react()
 
     @custom.command(aliases=['rm', 'del'])
+    @commands.is_owner()
     async def delete(self, ctx, name: CommandName):
         """Removes a custom command"""
         if name not in self.config:
@@ -59,6 +57,7 @@ class CustomCommands:
         await ctx.auto_react()
 
     @custom.command(aliases=['e'])
+    @commands.is_owner()
     async def edit(self, ctx, name: CommandName, *, content):
         """Removes a custom command"""
         if name not in self.config:
