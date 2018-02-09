@@ -132,8 +132,9 @@ class Meta:
         if isinstance(error, commands.TooManyArguments):
             await ctx.auto_react('🚫')
             await ctx.send(
-                "You can only add one prefix at a time. If you are trying to "
-                "use a multi-word prefix "
+                'You can only add one prefix at a time. If you are trying to '
+                'use a multi-word prefix make sure you used "quotes" around it.'
+                'Keep in mind \'single quotes\' won\'t work.'
             )
 
     @is_mod()
