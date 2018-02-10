@@ -128,11 +128,11 @@ class TorGenius(commands.Bot):
         if len(prefixes) == 0:
             # No prefixes yet
             await self.prefixes.put(guild.id, [])
-        elif len(prefixes) >= 10:
+        elif len(prefixes) >= 40:
             # Why would anyone even do this
             # Should be caught in prefix command
             raise RuntimeError(
-                "A server can't have more than 10 custom prefixes."
+                "A server can't have more than 40 custom prefixes."
             )
         else:
             await self.prefixes.put(
