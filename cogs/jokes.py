@@ -74,6 +74,7 @@ class Jokes:
 
     @commands.command(aliases=['yo', 'mamma', 'mom'])
     async def yo_mamma(self, ctx):
+        """Yo mom jokes"""
         await ctx.channel.trigger_typing()
         async with aiohttp.ClientSession() as s:
             async with s.get(

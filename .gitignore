@@ -1,6 +1,7 @@
 config.py
 praw.ini
 prefixes.json
+custom_commands.json
 
 # Created by https://www.gitignore.io/api/python,pycharm
 

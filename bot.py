@@ -107,6 +107,11 @@ class TorGenius(commands.Bot):
                 file=sys.stderr
             )
         elif isinstance(error, commands.CheckFailure):
+            if ctx.command.name == 'calc':
+                return await ctx.send(f'You are not allowed to use this '
+                                      f'command. If you want to do some math, '
+                                      f'try `{ctx.prefix}quick <question or '
+                                      f'math>`.')
             await ctx.send('You are not allowed to use this command.')
 
     def get_guild_prefixes(self, guild):

@@ -60,6 +60,7 @@ class Info:
 
     @commands.command()
     async def emojis(self, ctx, *, query=''):
+        """List the servers emojis without spamming."""
         entries = [f'{str(e)}, :{e.name}:, `{str(e)}`' for e in
                    ctx.guild.emojis if query in e.name]
 

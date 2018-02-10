@@ -67,5 +67,9 @@ class Config:
     def __len__(self):
         return len(self._db)
 
+    def __iter__(self):
+        for k, v in self.all().items():
+            yield (k, v)
+
     def all(self):
         return self._db
