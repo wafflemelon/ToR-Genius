@@ -4,6 +4,8 @@ import discord
 import humanize
 from discord.ext import commands
 
+from cogs.utils.paginator import Pages
+
 # following is from
 # https://github.com/khazhyk/dango.py/blob/master/plugins/info.py
 # Discord epoch
@@ -50,11 +52,22 @@ class Info:
 
     # noinspection PyUnresolvedReferences
     @commands.command()
-    async def joined(self, ctx, member: commands.MemberConverter=None):
+    async def joined(self, ctx, member: commands.MemberConverter = None):
         """Find out concisely when a member joined."""
         member = member or ctx.author
         await ctx.send(f'{member.display_name} joined '
                        f'{format_time(member.joined_at)}')
+
+    @commands.command()
+    async def emojis(self, ctx, *, query=''):
+        entries = [f'{str(e)}, :{e.name}:, `{str(e)}`' for e in
+                   ctx.guild.emojis if query in e.name]
+
+        if not entries:
+            return await ctx.send('No results found for query.')
+
+        p = Pages(ctx, entries=entries)
+        await p.paginate()
 
 
 def setup(bot):
