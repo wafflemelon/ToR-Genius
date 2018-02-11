@@ -201,7 +201,7 @@ class Other:
         """Generate a the floor is lava meme."""
 
         if len(what) > 192:
-            return await ctx.send("The floor isn't that long. (max 29 chars)")
+            return await ctx.send("The floor isn't that long. (max 192 chars)")
 
         img, name = img
 
