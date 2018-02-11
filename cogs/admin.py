@@ -108,7 +108,6 @@ class Admin:
         if extra:
             self._last_result = extra
 
-
         content = str(content) if content is not None else None
         inp = str(inp) if inp is not None else None
         extra = str(extra) if extra is not None else None

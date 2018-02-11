@@ -194,6 +194,42 @@ class Other:
         bio.seek(0)
         await ctx.send(file=discord.File(bio, filename='blame.png'))
 
+    # noinspection PyPep8Naming
+    @commands.command(aliases=['floor'])
+    async def the_floor(self, ctx, img: LinkOrAvatar, *, what):
+        """Generate a the floor is lava meme."""
+
+        if len(what) > 23:
+            return await ctx.send("The floor isn't that long. (max 29 chars)")
+
+        img, name = img
+
+        meme_format = Image.open('floor.png')
+
+        # == Text ==
+        fnt = ImageFont.truetype('Arial.ttf', 50)
+        d = ImageDraw.Draw(meme_format)
+
+        d.text(
+            (20, 30),
+            f'The floor is {what}',
+            font=fnt,
+            fill=(0,) * 4
+        )
+
+        # == Avatars ==
+        first = img.resize((20, 20))
+        second = img.resize((40, 40))
+
+        meme_format.paste(first, (140, 137))
+        meme_format.paste(second, (460, 137))
+
+        # == Sending ==
+        bio = io.BytesIO()
+        meme_format.save(bio, 'PNG')
+        bio.seek(0)
+        await ctx.send(file=discord.File(bio, filename='floor.png'))
+
 
 def setup(bot):
     bot.add_cog(Other(bot))
