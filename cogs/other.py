@@ -214,7 +214,7 @@ class Other:
             (20, 30),
             f'The floor is {what}',
             font=fnt,
-            fill=(0,) * 4
+            fill=(0,) * 3
         )
 
         # == Avatars ==
