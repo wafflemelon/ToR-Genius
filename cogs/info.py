@@ -29,8 +29,9 @@ class Info:
             await ctx.send(err)
 
     @commands.command(aliases=['perms'])
-    async def permissions(self, ctx, member: commands.MemberConverter = None, *,
-                          channel: commands.TextChannelConverter = None):
+    async def permissions(self, ctx, member: commands.MemberConverter = None,
+                          channel: commands.TextChannelConverter = None,
+                          *, query=''):
         """Get the permissions of a member in a certain channel"""
         channel = channel or ctx.channel
         user = member or ctx.author
@@ -39,10 +40,16 @@ class Info:
 
         desc = []
 
-        for p, v in perms:
-            desc.append(
-                f'**{p.replace("_", " ").title()}**: {"Yes" if v else "No"}'
-            )
+        # I'm sorry
+        desc.extend([
+            f'**{p.replace("_", " ").title()}**: {"Yes" if v else "No"}'
+            for p, v in perms
+            if query.lower() in p.lower().replace("_", " ")
+            or query.lower() in ("Yes" if v else "No")
+        ])
+
+        if not desc:
+            return await ctx.send('No results found.')
 
         e = discord.Embed(
             description='\n'.join(desc),
