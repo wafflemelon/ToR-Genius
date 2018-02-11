@@ -40,7 +40,9 @@ class Info:
         desc = []
 
         for p, v in perms:
-            desc.append(f'**{p}**: {v}')
+            desc.append(
+                f'**{p.replace("_", " ").title()}**: {"Yes" if v else "No"}'
+            )
 
         e = discord.Embed(
             description='\n'.join(desc),
