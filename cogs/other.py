@@ -267,6 +267,44 @@ class Other:
         bio.seek(0)
         await ctx.send(file=discord.File(bio, filename='floor.png'))
 
+    # noinspection PyUnresolvedReferences
+    @commands.command(aliases=['car'])
+    async def highway(self, ctx, img: AvatarOrOnlineImage,
+                      first_option, *, second_option):
+        """Generate a "Left Exit 12 Off Ramp" meme."""
+
+        if len(first_option) > 54 or len(second_option) > 54:
+            return await ctx.send("Your options can't be that long. (Max 54)")
+
+        meme_format = Image.open('highway.jpg')
+
+        # == Text one ==
+        fnt = ImageFont.truetype('Arial.ttf', 22)
+        d = ImageDraw.Draw(meme_format)
+
+        margin = 165
+        offset = 80
+        for line in textwrap.wrap(first_option, width=9):
+            d.text((margin, offset), line, font=fnt, fill=(255,) * 3)
+            offset += fnt.getsize(line)[1]
+
+        # == Text two ==
+
+        margin = 380
+        offset = 80
+        for line in textwrap.wrap(second_option, width=9):
+            d.text((margin, offset), line, font=fnt, fill=(255,) * 3)
+            offset += fnt.getsize(line)[1]
+
+        # == Image ==
+        meme_format.paste(img.resize((50, 50)), (340, 430))
+
+        # == Sending ==
+        bio = io.BytesIO()
+        meme_format.save(bio, 'PNG')
+        bio.seek(0)
+        await ctx.send(file=discord.File(bio, filename='floor.png'))
+
 
 def setup(bot):
     bot.add_cog(Other(bot))
