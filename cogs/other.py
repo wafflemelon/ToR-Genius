@@ -17,6 +17,45 @@ async def download(url):
             return io.BytesIO(await r.read())
 
 
+# The floor is good naming
+class AvatarOrOnlineImage(commands.Converter):
+    async def convert(self, ctx, argument):
+        try:
+            possible_member = await commands.MemberConverter() \
+                .convert(ctx, argument)
+            url = possible_member.avatar_url_as(format='png')
+            url = url.replace('gif', 'png').strip('<>')
+
+            img = await download(url)
+
+            img = Image.open(img)
+
+            return img.convert('RGB')
+        except commands.BadArgument:
+            pass
+
+            # from https://stackoverflow.com/questions/169625/
+            # regex-to-check-if-valid-url-that-ends-in-jpg-png-or-gif
+            # (Sorry about breaking the URL)
+
+            # will add more image formats as time goes on
+        regex = r'<?(?:([^:/?#]+):)?(?://([^/?#]*))?([^?#]*\.' \
+                r'(?:jpg|png|jpeg))(?:\?([^#]*))?(?:#(.*))?>?'
+
+        regex = re.compile(regex, re.IGNORECASE)
+
+        if re.fullmatch(regex, argument):
+            img = await download(argument.strip('<>'))
+
+            img = Image.open(img)
+
+            return img.convert('RGB')
+        else:
+            raise commands.BadArgument(
+                "That URL doesn't seem to lead to a valid image"
+            )
+
+
 class LinkOrAvatar(commands.Converter):
     special_cases = {
         'itsthejoker': 'https://avatars0.githubusercontent.com/u/5179553'
@@ -122,7 +161,7 @@ class Other:
 
     # noinspection PyUnresolvedReferences,PyPep8Naming
     @commands.command()
-    async def blame(self, ctx, *, img: LinkOrAvatar = None):
+    async def blame(self, ctx, *, img: AvatarOrOnlineImage = None):
         """Blame everyone! Defaults to perryprog.
 
         Will also accept image urls ending in jpg, png, and jpeg."""
@@ -195,15 +234,13 @@ class Other:
         bio.seek(0)
         await ctx.send(file=discord.File(bio, filename='blame.png'))
 
-    # noinspection PyPep8Naming
+    # noinspection PyPep8Naming,PyUnresolvedReferences
     @commands.command(aliases=['floor'])
-    async def the_floor(self, ctx, img: LinkOrAvatar, *, what):
+    async def the_floor(self, ctx, img: AvatarOrOnlineImage, *, what):
         """Generate a the floor is lava meme."""
 
         if len(what) > 179:
             return await ctx.send("The floor isn't that long. (max 179 chars)")
-
-        img, name = img
 
         meme_format = Image.open('floor.png')
 
