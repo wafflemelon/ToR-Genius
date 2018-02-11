@@ -1,5 +1,6 @@
 import io
 import re
+import textwrap
 from math import floor
 
 import aiohttp
@@ -199,7 +200,7 @@ class Other:
     async def the_floor(self, ctx, img: LinkOrAvatar, *, what):
         """Generate a the floor is lava meme."""
 
-        if len(what) > 29:
+        if len(what) > 192:
             return await ctx.send("The floor isn't that long. (max 29 chars)")
 
         img, name = img
@@ -210,12 +211,11 @@ class Other:
         fnt = ImageFont.truetype('Arial.ttf', 30)
         d = ImageDraw.Draw(meme_format)
 
-        d.text(
-            (20, 30),
-            f'The floor is {what}',
-            font=fnt,
-            fill=(0,) * 3
-        )
+        margin = 20
+        offset = 25
+        for line in textwrap.wrap(f'The floor is {what}', width=65):
+            d.text((margin, offset), line, font=fnt, fill=(0,) * 3)
+            offset += fnt.getsize(line)[1]
 
         # == Avatars ==
         first = img.resize((20, 20))
