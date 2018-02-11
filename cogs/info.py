@@ -31,7 +31,7 @@ class Info:
     @commands.command(aliases=['perms'])
     async def permissions(self, ctx, member: commands.MemberConverter = None,
                           channel: commands.TextChannelConverter = None,
-                          *, query=''):
+                          *, query: str.lower = ''):
         """Get the permissions of a member in a certain channel"""
         channel = channel or ctx.channel
         user = member or ctx.author
@@ -41,12 +41,12 @@ class Info:
         desc = []
 
         # I'm sorry
-        desc.extend([
+        desc.extend(
             f'**{p.replace("_", " ").title()}**: {"Yes" if v else "No"}'
             for p, v in perms
-            if query.lower() in p.lower().replace("_", " ")
-            or query.lower() in ("Yes" if v else "No")
-        ])
+            if query in p.lower().replace("_", " ")
+            or query in ("Yes" if v else "No")
+        )
 
         if not desc:
             return await ctx.send('No results found.')
