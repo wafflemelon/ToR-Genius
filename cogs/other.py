@@ -258,8 +258,8 @@ class Other:
         first = img.resize((20, 20))
         second = img.resize((40, 40))
 
-        meme_format.paste(first, (140, 137))
-        meme_format.paste(second, (460, 137))
+        meme_format.paste(first, (143, 135))
+        meme_format.paste(second, (465, 133))
 
         # == Sending ==
         bio = io.BytesIO()
