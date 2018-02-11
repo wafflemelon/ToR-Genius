@@ -200,8 +200,8 @@ class Other:
     async def the_floor(self, ctx, img: LinkOrAvatar, *, what):
         """Generate a the floor is lava meme."""
 
-        if len(what) > 192:
-            return await ctx.send("The floor isn't that long. (max 192 chars)")
+        if len(what) > 179:
+            return await ctx.send("The floor isn't that long. (max 179 chars)")
 
         img, name = img
 
