@@ -69,6 +69,10 @@ class Meta:
 
         Calling without a subcommand lists prefixes
         """
+
+        if ctx.prefix == '\N{ZERO WIDTH SPACE}' * 2:
+            return await ctx.send('#ZwspPrefixMasterrace')
+
         prefixes = self.bot.get_guild_prefixes(ctx.guild)
 
         # Don't list the mention prefix twice
@@ -189,7 +193,7 @@ class Meta:
         )
 
     @commands.command(aliases=['fb'])
-    @commands.cooldown(rate=1, per=2*60, type=commands.BucketType.user)
+    @commands.cooldown(rate=1, per=2 * 60, type=commands.BucketType.user)
     async def feedback(self, ctx, *, body: str):
         """PM the owner with feedback, questions and more.
 
