@@ -199,7 +199,7 @@ class Other:
     async def the_floor(self, ctx, img: LinkOrAvatar, *, what):
         """Generate a the floor is lava meme."""
 
-        if len(what) > 23:
+        if len(what) > 29:
             return await ctx.send("The floor isn't that long. (max 29 chars)")
 
         img, name = img
@@ -207,7 +207,7 @@ class Other:
         meme_format = Image.open('floor.png')
 
         # == Text ==
-        fnt = ImageFont.truetype('Arial.ttf', 50)
+        fnt = ImageFont.truetype('Arial.ttf', 30)
         d = ImageDraw.Draw(meme_format)
 
         d.text(
