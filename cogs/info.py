@@ -1,3 +1,4 @@
+from collections import Counter
 from datetime import datetime
 
 import discord
@@ -77,6 +78,22 @@ class Info:
             return await ctx.send('No results found for query.')
 
         p = Pages(ctx, entries=entries)
+        await p.paginate()
+
+    @commands.command()
+    async def games(self, ctx, *, query: str.lower = ''):
+        """Search or list games, sorted by most common"""
+
+        count = Counter([
+            u.game.name
+            for u in ctx.guild.members
+            if u.game and query in u.game.name.lower()
+        ])
+
+        p = Pages(ctx, entries=[
+            f'**{i[0]}**: {i[1]}' for i in count.most_common()
+        ])
+
         await p.paginate()
 
 
