@@ -305,6 +305,35 @@ class Other:
         bio.seek(0)
         await ctx.send(file=discord.File(bio, filename='floor.png'))
 
+    @commands.command('spam')
+    async def who_did_this(self, ctx, search=3):
+        """Find out who spammed a help command.
+
+        Specifically for the dbots server.
+
+        Search is how far to go before hitting a bot."""
+        final_results = []
+
+        async for m in ctx.channel.history(limit=search):
+            if m.author.bot:
+                # We probably found the end of the train
+                async for bot_m in ctx.channel.history(before=m):
+                    if not bot_m.author.bot:
+                        # Start of the train
+                        final_results.append((bot_m.author, bot_m.content))
+                        async for others_m in ctx.channel.history(
+                                limit=5, before=bot_m
+                        ):
+                            final_results.append(
+                                (others_m.author, others_m.content)
+                            )
+                            return await ctx.send(
+                                '\n'.join(
+                                    f'**{r[0].display_name}:** {r[1]}'
+                                    for r in final_results
+                                )
+                            )
+
 
 def setup(bot):
     bot.add_cog(Other(bot))
