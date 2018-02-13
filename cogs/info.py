@@ -96,6 +96,38 @@ class Info:
 
         await p.paginate()
 
+    @commands.command()
+    async def names(self, ctx, *, query: str.lower = ''):
+        """Search or list names on this guild, sorted by most common"""
+
+        count = Counter([
+            u.name
+            for u in ctx.guild.members
+            if query in u.name.lower()
+        ])
+
+        p = Pages(ctx, entries=[
+            f'**{i[0]}**: {i[1]}' for i in count.most_common()
+        ])
+
+        await p.paginate()
+
+    @commands.command()
+    async def nicks(self, ctx, *, query: str.lower = ''):
+        """Search or list nicks on this guild, sorted by most common"""
+
+        count = Counter([
+            u.display_name
+            for u in ctx.guild.members
+            if query in u.display_name.lower()
+        ])
+
+        p = Pages(ctx, entries=[
+            f'**{i[0]}**: {i[1]}' for i in count.most_common()
+        ])
+
+        await p.paginate()
+
 
 def setup(bot):
     bot.add_cog(Info(bot))
