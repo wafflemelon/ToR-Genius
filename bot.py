@@ -39,7 +39,8 @@ initial_extensions = [
     'cogs.humanize',
     'cogs.jokes',
     'cogs.bostonlib',
-    'cogs.custom'
+    'cogs.custom',
+    'cogs.logging'
 ]
 
 
@@ -87,6 +88,7 @@ class TorGenius(commands.Bot):
                 traceback.print_exc()
 
     async def on_command_error(self, ctx, error):
+
         if isinstance(error, commands.NoPrivateMessage):
             await ctx.author.send(
                 'This command cannot be used in private messages.'
@@ -96,6 +98,9 @@ class TorGenius(commands.Bot):
                 'Sorry. This command is disabled and cannot be used.'
             )
         elif isinstance(error, commands.CommandInvokeError):
+            log.warning(f'Command error on command {ctx.command.qualified_name}'
+                        f' from {ctx.author}: \n {error.original.__tracback__}.'
+                        f' See stdout/err for more details.')
             print(
                 f'In {ctx.command.qualified_name}:',
                 file=sys.stderr
