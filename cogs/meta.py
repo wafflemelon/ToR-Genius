@@ -11,7 +11,7 @@ import discord
 from discord.ext import commands
 
 from cogs.utils.checks import is_mod
-from .utils.paginator import HelpPaginator
+from .utils.paginator import HelpPaginator, Pages
 
 
 class Prefix(commands.Converter):
@@ -78,17 +78,8 @@ class Meta:
         # Don't list the mention prefix twice
         del prefixes[1]
 
-        embed = discord.Embed(
-            title='Prefixes',
-            color=discord.Color.dark_teal(),
-            description='\n'.join(
-                f'#{index}: {elem}' for index, elem in enumerate(prefixes, 1)
-            )
-        ).set_footer(
-            text=f'I have {len(prefixes)} prefixes'
-        )
-
-        await ctx.send(embed=embed)
+        p = Pages(ctx, entries=prefixes)
+        await p.paginate()
 
     # Ignore extra for when people forget to quote
     #
