@@ -305,6 +305,29 @@ class Other:
         bio.seek(0)
         await ctx.send(file=discord.File(bio, filename='floor.png'))
 
+    @commands.command()
+    async def wheeze(self, ctx, *, message: str):
+        """Generate a wheeze meme."""
+
+        if len(message) > 10:
+            return await ctx.send(
+                "Can't do more than 10 characters because reasons"
+            )
+
+        meme_format = Image.open('wheeze.png')
+
+        # == Text ==
+        fnt = ImageFont.truetype('Arial.ttf', 20)
+        d = ImageDraw.Draw(meme_format)
+
+        d.text((34, 483), message, font=fnt, fill=(0,) * 3)
+
+        # == Sending ==
+        bio = io.BytesIO()
+        meme_format.save(bio, 'PNG')
+        bio.seek(0)
+        await ctx.send(file=discord.File(bio, filename='wheeze.png'))
+
     @commands.command('spam')
     async def who_did_this(self, ctx, search=3):
         """Find out who spammed a help command.
