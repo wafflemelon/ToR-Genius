@@ -368,7 +368,7 @@ class Other:
     # noinspection PyUnresolvedReferences
     @commands.command(aliases=['garbage'])
     async def trash(self, ctx, first: AvatarOrOnlineImageOrText,
-                    second: AvatarOrOnlineImageOrText):
+                    *, second: AvatarOrOnlineImageOrText):
         """Generate a taking out the trash meme."""
 
         if isinstance(first, str):
