@@ -17,6 +17,43 @@ async def download(url):
             return io.BytesIO(await r.read())
 
 
+class AvatarOrOnlineImageOrText(commands.Converter):
+    async def convert(self, ctx, argument):
+        try:
+            possible_member = await commands.MemberConverter() \
+                .convert(ctx, argument)
+            url = possible_member.avatar_url_as(format='png')
+            url = url.replace('gif', 'png').strip('<>')
+
+            img = await download(url)
+
+            img = Image.open(img)
+
+            return img.convert('RGBA')
+        except commands.BadArgument:
+            pass
+
+            # from https://stackoverflow.com/questions/169625/
+            # regex-to-check-if-valid-url-that-ends-in-jpg-png-or-gif
+            # (Sorry about breaking the URL)
+
+            # will add more image formats as time goes on
+        regex = r'<?(?:([^:/?#]+):)?(?://([^/?#]*))?([^?#]*\.' \
+                r'(?:jpg|png|jpeg))(?:\?([^#]*))?(?:#(.*))?>?'
+
+        regex = re.compile(regex, re.IGNORECASE)
+
+        if re.fullmatch(regex, argument):
+            img = await download(argument.strip('<>'))
+
+            img = Image.open(img)
+
+            return img.convert('RGBA')
+        else:
+            # must be text
+            return argument
+
+
 # The floor is good naming
 class AvatarOrOnlineImage(commands.Converter):
     async def convert(self, ctx, argument):
@@ -242,7 +279,7 @@ class Other:
         if len(what) > 179:
             return await ctx.send("The floor isn't that long. (max 179 chars)")
 
-        meme_format = Image.open('floor.png')
+        meme_format = Image.open('memes/floor.png')
 
         # == Text ==
         fnt = ImageFont.truetype('Arial.ttf', 30)
@@ -276,7 +313,7 @@ class Other:
         if len(first_option) > 54 or len(second_option) > 54:
             return await ctx.send("Your options can't be that long. (Max 54)")
 
-        meme_format = Image.open('highway.jpg')
+        meme_format = Image.open('memes/highway.jpg')
 
         # == Text one ==
         fnt = ImageFont.truetype('Arial.ttf', 22)
@@ -314,7 +351,7 @@ class Other:
                 "Can't do more than 10 characters because reasons"
             )
 
-        meme_format = Image.open('wheeze.png')
+        meme_format = Image.open('memes/wheeze.png')
 
         # == Text ==
         fnt = ImageFont.truetype('Arial.ttf', 20)
@@ -327,6 +364,63 @@ class Other:
         meme_format.save(bio, 'PNG')
         bio.seek(0)
         await ctx.send(file=discord.File(bio, filename='wheeze.png'))
+
+    # noinspection PyUnresolvedReferences
+    @commands.command(aliases=['garbage'])
+    async def trash(self, ctx, first: AvatarOrOnlineImageOrText,
+                    second: AvatarOrOnlineImageOrText):
+        """Generate a taking out the trash meme."""
+
+        if isinstance(first, str):
+            if len(first) > 6:
+                return await ctx.send(
+                    "Can't do more than 6 characters because reasons"
+                )
+
+        if isinstance(second, str):
+            if len(second) > 25:
+                return await ctx.send(
+                    "Can't do more than 6 characters because reasons"
+                )
+
+        meme_format = Image.open('memes/garbage.jpg')
+        meme_format = meme_format.convert('RGBA')
+
+        # == Text/Avatars 1==
+        if isinstance(first, str):
+            fnt = ImageFont.truetype('Arial.ttf', 50)
+            d = ImageDraw.Draw(meme_format)
+
+            margin = 440
+            offset = 35
+            for line in textwrap.wrap(first, width=4):
+                d.text((margin, offset), line, font=fnt, fill=(255,) * 3)
+                offset += fnt.getsize(line)[1]
+        else:
+            first = first.resize((180, 180))
+            first = first.rotate(20, expand=True)
+            meme_format.paste(first, (390, 15), first)
+
+        # == Text/Avatars 2 ==
+        if isinstance(second, str):
+            fnt = ImageFont.truetype('Arial.ttf', 50)
+            d = ImageDraw.Draw(meme_format)
+
+            margin = 720
+            offset = 170
+            for line in textwrap.wrap(second, width=5):
+                d.text((margin, offset), line, font=fnt, fill=(0,) * 3)
+                offset += fnt.getsize(line)[1]
+        else:
+            second = second.resize((250, 250))
+            second = second.rotate(-10, expand=True)
+            meme_format.paste(second, (620, 150), second)
+
+        # == Sending ==
+        bio = io.BytesIO()
+        meme_format.save(bio, 'PNG')
+        bio.seek(0)
+        await ctx.send(file=discord.File(bio, filename='floor.png'))
 
     @commands.command('spam')
     async def who_did_this(self, ctx, search=3):
