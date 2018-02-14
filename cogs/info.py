@@ -1,8 +1,10 @@
+import io
 from collections import Counter
 from datetime import datetime
 
 import discord
 import humanize
+from PIL import Image, ImageDraw
 from discord.ext import commands
 
 from cogs.utils.paginator import Pages
@@ -18,6 +20,26 @@ def format_time(time):
         return "Unknown"
     return "{} ({} UTC)".format(
         humanize.naturaltime(time + (datetime.now() - datetime.utcnow())), time)
+
+
+# use function here because we don't need `ctx`
+# We also call it with a splat, so we get one at a time
+def parse_color(arg):
+    arg.strip('#')  # so what if it ends in "#"
+
+    # Try to cast to int
+    try:
+        value = int(arg, 16)
+    except ValueError:
+        # might be color name
+        pass
+    else:
+        return discord.Color(min(value, 0xFFFFFF))
+
+    try:
+        return getattr(discord.Color, arg)()
+    except AttributeError:
+        raise commands.BadArgument(f"{arg} doesn't seem to be a valid color.")
 
 
 class Info:
@@ -127,6 +149,41 @@ class Info:
         ])
 
         await p.paginate()
+
+    @commands.command()
+    async def color(self, ctx, *colors: parse_color):
+        """Generate a color(s)"""
+
+        # == Parsing ==
+
+        colors = [(
+            col.value >> 16,
+            col.value >> 8 & 0xff,
+            col.value & 0xff
+        ) for col in colors]
+
+        # == Drawing ==
+
+        # Each square is 256 by 256
+        width = 256 * len(colors)
+
+        # background is same color as start to be lazy
+        image = Image.new('RGB', (width, 256), colors[0])
+        draw = ImageDraw.Draw(image)
+
+        for i in range(1, len(colors)):
+            draw.rectangle((256 * i, 0, 256 * (i + 1), 256), colors[i])
+
+        # == Sending ==
+        bio = io.BytesIO()
+        image.save(bio, 'PNG')
+        bio.seek(0)
+        await ctx.send(
+            file=discord.File(
+                bio,
+                filename='color.png' if len(colors) == 1 else 'colors.png'
+            )
+        )
 
 
 def setup(bot):

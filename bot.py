@@ -99,8 +99,8 @@ class TorGenius(commands.Bot):
             )
         elif isinstance(error, commands.CommandInvokeError):
             log.warning(f'Command error on command {ctx.command.qualified_name}'
-                        f' from {ctx.author}: \n {error.original.__tracback__}.'
-                        f' See stdout/err for more details.')
+                        f' from {ctx.author}: \n {error.original.__traceback__}'
+                        f'.See stdout/err for more details.')
             print(
                 f'In {ctx.command.qualified_name}:',
                 file=sys.stderr
