@@ -67,7 +67,7 @@ class AvatarOrOnlineImage(commands.Converter):
 
             img = Image.open(img)
 
-            return img.convert('RGB')
+            return img.convert('RGBA'), possible_member.name
         except commands.BadArgument:
             pass
 
@@ -81,12 +81,15 @@ class AvatarOrOnlineImage(commands.Converter):
 
         regex = re.compile(regex, re.IGNORECASE)
 
-        if re.fullmatch(regex, argument):
-            img = await download(argument.strip('<>'))
+        if re.fullmatch(regex, argument.split(' ')[0]):
+            img = await download(argument.split(' ')[0].strip('<>'))
 
             img = Image.open(img)
 
-            return img.convert('RGB')
+            text = ' '.join(argument.split(' ')[1:])
+            if not text:
+                raise commands.BadArgument('No text supplied for image')
+            return img.convert('RGBA'), text
         else:
             raise commands.BadArgument(
                 "That URL doesn't seem to lead to a valid image"
