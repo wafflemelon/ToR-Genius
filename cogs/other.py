@@ -315,6 +315,8 @@ class Other:
                       first_option, *, second_option):
         """Generate a "Left Exit 12 Off Ramp" meme."""
 
+        img, _ = img
+
         if len(first_option) > 54 or len(second_option) > 54:
             return await ctx.send("Your options can't be that long. (Max 54)")
 
