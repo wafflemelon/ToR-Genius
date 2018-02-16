@@ -251,6 +251,11 @@ class Pages:
     async def paginate(self):
         """Actually paginate the entries and
         run the interactive loop if necessary."""
+        if not self.entries:
+            # I just say no results found because that's my most common use
+            # case.
+            return await self.channel.send('No results found.')
+
         first_page = self.show_page(1, first=True)
         if not self.paginating:
             await first_page
