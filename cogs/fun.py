@@ -106,6 +106,13 @@ class Fun:
         )
 
     @commands.command()
+    async def shuffle(self, ctx, *choices):
+        """Shuffle the input, splitting on spaces"""
+
+        random.shuffle(choices)
+        await ctx.send(' '.join(choices))
+
+    @commands.command()
     async def warn(self, ctx, member: commands.MemberConverter, *, _=None):
         """Meme warn. Doesn't actually do anything."""
         member = ctx.author if not member else member
