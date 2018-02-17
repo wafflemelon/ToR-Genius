@@ -109,8 +109,7 @@ class Fun:
     async def shuffle(self, ctx, *choices):
         """Shuffle the input, splitting on spaces"""
 
-        random.shuffle(choices)
-        await ctx.send(' '.join(choices))
+        await ctx.send(' '.join(random.sample(choices, len(choices))))
 
     @commands.command()
     async def warn(self, ctx, member: commands.MemberConverter, *, _=None):
