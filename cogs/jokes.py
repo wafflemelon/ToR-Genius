@@ -105,7 +105,7 @@ class Jokes:
                 text = text['joke']
                 await ctx.send(text)
 
-    @commands.command(aliases='opf')
+    @commands.command(aliases=['opf'])
     async def oldpeoplefacebook(self, ctx, query: str.lower = ''):
         await ctx.send(
             random.choice([x for x in opf_list if query in x.lower()])
