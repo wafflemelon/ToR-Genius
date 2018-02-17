@@ -147,7 +147,7 @@ class Meta:
 
         try:
             prefixes.remove(prefix)
-        except KeyError:
+        except ValueError:
             await ctx.auto_react('🚫')
             await ctx.send("That's not one of my prefixes, sorry!")
             return
