@@ -107,6 +107,7 @@ class Jokes:
 
     @commands.command(aliases=['opf'])
     async def oldpeoplefacebook(self, ctx, query: str.lower = ''):
+        """Get a random quote from r/oldpeoplefacebook."""
         final_list = [x for x in opf_list if query in x.lower()]
         if not final_list:
             return await ctx.send('No results found.')
