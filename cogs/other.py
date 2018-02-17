@@ -429,6 +429,35 @@ class Other:
         bio.seek(0)
         await ctx.send(file=discord.File(bio, filename='floor.png'))
 
+    @commands.command()
+    async def captcha(self, ctx, img: AvatarOrOnlineImage, message=None):
+        """Generate a select all <blank>"""
+
+        img, name = img
+        name = re.sub(r'\W', '', name).lower()
+        name = message or name
+
+        meme_format = Image.open('memes/captcha.png')
+
+        # == Images ==
+        img = img.resize((128, 128))
+
+        for x_mul in range(3):
+            for y_mul in range(3):
+                meme_format.paste(img, (28 + 128 * x_mul, 174 + 128 * y_mul))
+
+        # == Text ==
+        fnt = ImageFont.truetype('Arial.ttf', 20)
+        d = ImageDraw.Draw(meme_format)
+
+        d.text((51, 95), name, font=fnt, fill=(255,) * 3)
+
+        # == Sending ==
+        bio = io.BytesIO()
+        meme_format.save(bio, 'PNG')
+        bio.seek(0)
+        await ctx.send(file=discord.File(bio, filename='floor.png'))
+
     @commands.command('spam')
     async def who_did_this(self, ctx, search=3):
         """Find out who spammed a help command.
