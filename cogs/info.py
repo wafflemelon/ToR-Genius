@@ -91,6 +91,13 @@ class Info:
                        f'{format_time(member.joined_at)}')
 
     @commands.command()
+    async def created(self, ctx, member: commands.MemberConverter = None):
+        """Find out concisely when a user joined Discord."""
+        member = member or ctx.author
+        await ctx.send(f'{member.display_name} joined '
+                       f'{format_time(member.created_at)}')
+
+    @commands.command()
     async def emojis(self, ctx, *, query=''):
         """List the servers emojis without spamming."""
         entries = [f'{str(e)}, :{e.name}:, `{str(e)}`' for e in
