@@ -3,6 +3,27 @@ import random
 import aiohttp
 from discord.ext import commands
 
+# noinspection SpellCheckingInspection
+opf_list = [
+    "Sent from AOL Mobile Mail",
+    "John had surgery Friday and he's with the lord now.",
+    "Lovely pics as alway, Janice. I have terminal brain cancer.",
+    "DISCUSTING",
+    "I DID NOT POST THAT! SOMEONE HAS HACKED MY ACCOUNT",
+    "LOVE ETHYL",
+    "All kittens are dead.",
+    "Just got back from the doctor. I have Ebola. See you at church on Sunday!",
+    "1.	Preheat oven to 350 degrees F (175 degrees C).2.	Stir cream cheese, milk, butter, and garlic salt together in a saucepan over low heat. Cook, stirring frequently, until the cheese has melted completely and the sauce is smooth, about 5 minutes. Stir corn, green chilies, and jalapeno peppers into the sauce. Pour corn mixture into a baking dish. 3.	Bake in preheated oven for 30 minutes.",
+    "ADULT ONLY",
+    "Are you my grandson?",
+    "http://m.facebook.com",
+    "Going to have tornadoes tomorrow.",
+    "WISH GOD WOULD TAKE ME.",
+    "YOU SURE ARE A LONG BABY",
+    "covfefe",
+    "REFURBISHD +OK?"
+]
+
 
 # noinspection SpellCheckingInspection
 class Jokes:
@@ -83,6 +104,12 @@ class Jokes:
                 text = await res.json(content_type='text/html')
                 text = text['joke']
                 await ctx.send(text)
+
+    @commands.command(aliases='opf')
+    async def oldpeoplefacebook(self, ctx, query: str.lower = ''):
+        await ctx.send(
+            random.choice([x for x in opf_list if query in x.lower()])
+        )
 
 
 def setup(bot):
