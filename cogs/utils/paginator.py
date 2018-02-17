@@ -48,7 +48,9 @@ class Pages:
         Our permissions for the channel.
     """
 
-    def __init__(self, ctx, *, entries, per_page=12, show_entry_count=True):
+    def __init__(self, ctx, *, entries, per_page=12, show_entry_count=True,
+                 hide_no_results=False):
+        self.hide_no_results = hide_no_results
         self.bot = ctx.bot
         self.entries = entries
         self.message = ctx.message
@@ -251,7 +253,7 @@ class Pages:
     async def paginate(self):
         """Actually paginate the entries and
         run the interactive loop if necessary."""
-        if not self.entries:
+        if not self.entries and not self.hide_no_results:
             # I just say no results found because that's my most common use
             # case.
             return await self.channel.send('No results found.')
@@ -613,7 +615,8 @@ def _command_signature(cmd):
 
 class HelpPaginator(Pages):
     def __init__(self, ctx, entries, *, per_page=4):
-        super().__init__(ctx, entries=entries, per_page=per_page)
+        super().__init__(ctx, entries=entries, per_page=per_page,
+                         hide_no_results=True)
         self.reaction_emojis.append(
             ('\N{WHITE QUESTION MARK ORNAMENT}', self.show_bot_help))
         self.total = len(entries)
