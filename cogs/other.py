@@ -440,11 +440,11 @@ class Other:
         meme_format = Image.open('memes/captcha.png')
 
         # == Images ==
-        img = img.resize((128, 128))
+        img = img.resize((129, 129))
 
         for x_mul in range(3):
             for y_mul in range(3):
-                meme_format.paste(img, (28 + 128 * x_mul, 174 + 128 * y_mul))
+                meme_format.paste(img, (27 + 129 * x_mul, 173 + 129 * y_mul))
 
         # == Text ==
         fnt = ImageFont.truetype('Arial.ttf', 20)
