@@ -17,7 +17,7 @@ async def download(url):
             return io.BytesIO(await r.read())
 
 
-class AvatarOrOnlineImageOrText(commands.Converter):
+class AvatarOrOnlineImage(commands.Converter):
     async def convert(self, ctx, argument):
         try:
             possible_member = await commands.MemberConverter() \
@@ -55,7 +55,7 @@ class AvatarOrOnlineImageOrText(commands.Converter):
 
 
 # The floor is good naming
-class AvatarOrOnlineImage(commands.Converter):
+class AvatarOrOnlineImageOrText(commands.Converter):
     async def convert(self, ctx, argument):
         try:
             possible_member = await commands.MemberConverter() \
@@ -201,7 +201,7 @@ class Other:
 
     # noinspection PyUnresolvedReferences,PyPep8Naming
     @commands.command()
-    async def blame(self, ctx, *, img: AvatarOrOnlineImage = None):
+    async def blame(self, ctx, *, img: AvatarOrOnlineImageOrText = None):
         """Blame everyone! Defaults to perryprog.
 
         Will also accept image urls ending in jpg, png, and jpeg."""
@@ -276,7 +276,7 @@ class Other:
 
     # noinspection PyPep8Naming,PyUnresolvedReferences
     @commands.command(aliases=['floor'])
-    async def the_floor(self, ctx, img: AvatarOrOnlineImage, *, what):
+    async def the_floor(self, ctx, img: AvatarOrOnlineImageOrText, *, what):
         """Generate a the floor is lava meme."""
 
         img, _ = img
@@ -311,7 +311,7 @@ class Other:
 
     # noinspection PyUnresolvedReferences
     @commands.command(aliases=['car'])
-    async def highway(self, ctx, img: AvatarOrOnlineImage,
+    async def highway(self, ctx, img: AvatarOrOnlineImageOrText,
                       first_option, *, second_option):
         """Generate a "Left Exit 12 Off Ramp" meme."""
 
@@ -374,8 +374,8 @@ class Other:
 
     # noinspection PyUnresolvedReferences
     @commands.command(aliases=['garbage'])
-    async def trash(self, ctx, first: AvatarOrOnlineImageOrText,
-                    *, second: AvatarOrOnlineImageOrText):
+    async def trash(self, ctx, first: AvatarOrOnlineImage,
+                    *, second: AvatarOrOnlineImage):
         """Generate a taking out the trash meme."""
 
         if isinstance(first, str):
@@ -430,7 +430,8 @@ class Other:
         await ctx.send(file=discord.File(bio, filename='floor.png'))
 
     @commands.command()
-    async def captcha(self, ctx, img: AvatarOrOnlineImage, message=None):
+    async def captcha(self, ctx, img: AvatarOrOnlineImageOrText,
+                      *, message=None):
         """Generate a select all <blank>"""
 
         img, name = img
