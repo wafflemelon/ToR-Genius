@@ -447,10 +447,10 @@ class Other:
                 meme_format.paste(img, (27 + 129 * x_mul, 173 + 129 * y_mul))
 
         # == Text ==
-        fnt = ImageFont.truetype('Arial.ttf', 20)
+        fnt = ImageFont.truetype('Arial.ttf', 30)
         d = ImageDraw.Draw(meme_format)
 
-        d.text((51, 95), name, font=fnt, fill=(255,) * 3)
+        d.text((51, 90), name, font=fnt, fill=(255,) * 3)
 
         # == Sending ==
         bio = io.BytesIO()
