@@ -7,9 +7,12 @@
 # from https://github.com/Rapptz/RoboDanny/blob/rewrite/cogs/mod.py
 
 import logging
+import time
 from collections import Counter
+from datetime import datetime
 
 import discord
+import humanize
 from discord.ext import commands
 
 from cogs.utils.checks import has_permissions
@@ -105,6 +108,45 @@ class Mod:
             )
         else:
             await ctx.send(message, delete_after=10)
+
+    @commands.command()
+    @has_permissions(manage_messages=True)
+    async def lockdown(self, ctx):
+        channel_ld = self.bot.lockdown.get(ctx.channel, None)
+        if channel_ld:
+            # There is a lockdown on the channel, turn it off
+            del self.bot.lockdown[ctx.channel]
+        else:
+            # turn on lockdown
+            self.bot.lockdown[ctx.channel] = time.time()
+
+        await ctx.auto_react()
+
+    async def __global_check(self, ctx):
+        if self.bot.is_owner(ctx.author):
+            return True
+
+        if ctx.author.permissions_in(ctx.channel).manage_messages:
+            return True
+
+        channel_ld = self.bot.lockdown.get(ctx.channel, None)
+        if channel_ld:
+            if time.time() - channel_ld > 60:
+                # It's been a minute
+                del self.bot.lockdown[ctx.channel]
+                return True
+
+            time_to_wait = humanize.naturaldelta(
+                datetime.fromtimestamp(channel_ld + 60)
+            )
+            await ctx.author.send(
+                f'Sorry, but the bot is on lockdown because some people were '
+                f'spamming it. Please wait {time_to_wait}.'
+            )
+            return False
+        else:
+            # No lockdown active, continue
+            return True
 
 
 def setup(bot):

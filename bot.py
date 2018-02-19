@@ -75,6 +75,8 @@ class TorGenius(commands.Bot):
         self.add_command(self.do)
         self.token = 'A dead meme'
 
+        self.lockdown = {}
+
         self.prefixes = Config('prefixes.json')
 
         for extension in initial_extensions:
@@ -114,6 +116,8 @@ class TorGenius(commands.Bot):
                 file=sys.stderr
             )
         elif isinstance(error, commands.CheckFailure):
+            if self.lockdown.get(ctx.channel, None):
+                return
             if ctx.command.name == 'calc':
                 return await ctx.send(f'You are not allowed to use this '
                                       f'command. If you want to do some math, '
