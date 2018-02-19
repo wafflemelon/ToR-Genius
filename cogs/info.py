@@ -1,4 +1,5 @@
 import io
+import locale
 from collections import Counter
 from datetime import datetime
 
@@ -191,6 +192,24 @@ class Info:
                 filename='color.png' if len(colors) == 1 else 'colors.png'
             )
         )
+
+    @commands.command()
+    async def hoisters(self, ctx, role: commands.RoleConverter = None,
+                       limit: int = 0):
+        """Get a list of possible hoisters, with an optional role, and an
+        optional limit."""
+
+        if role:
+            result = [
+                m.display_name for m in ctx.guild.members if role in m.roles
+            ]
+        else:
+            result = [m.display_name for m in ctx.guild.members]
+
+        result = result[:limit] if limit else result
+
+        p = Pages(ctx, entries=sorted(result, key=locale.strxfrm))
+        await p.paginate()
 
 
 def setup(bot):
