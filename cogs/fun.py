@@ -127,6 +127,13 @@ class Fun:
 
         await ctx.send('tor sh rm -rf .')
 
+    @commands.command()
+    async def b(self, ctx, *, message):
+        """This is a bad idea."""
+        message = list(message)
+        message[random.randint(0, len(message)-1)] = ':b:'
+        await ctx.send(''.join(message))
+
 
 def setup(bot):
     bot.add_cog(Fun(bot))
