@@ -68,8 +68,6 @@ class TorGenius(commands.Bot):
 
         _ = self.is_owner(discord.User)
 
-        self.client_id = config.client_id
-
         # noinspection SpellCheckingInspection
         self.game_list = ['corn', 'k', 'never gonna...', 'serdeff',
                           'lauye9r v7&^*^*111', 'no', 'no u', 'farts r funny']
