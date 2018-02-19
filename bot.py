@@ -134,7 +134,7 @@ class TorGenius(commands.Bot):
         This is just so I can get prefixes that aren't the @bot ones
         """
         guild_id = guild.id
-        return self.prefixes.get(guild_id, [';'])
+        return self.prefixes.get(guild_id, ['-'])
 
     async def set_guild_prefixes(self, guild, prefixes):
         if len(prefixes) == 0:

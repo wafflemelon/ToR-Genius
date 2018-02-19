@@ -171,9 +171,9 @@ class Meta:
     @is_mod()
     @prefix.command(name='reset')
     async def prefix_reset(self, ctx):
-        """Resets to the default prefix, `;`."""
+        """Resets to the default prefix, `-`."""
 
-        await self.bot.set_guild_prefixes(ctx.guild, [';'])
+        await self.bot.set_guild_prefixes(ctx.guild, ['-'])
         await ctx.auto_react()
 
     @commands.command(aliases=['pong'])
