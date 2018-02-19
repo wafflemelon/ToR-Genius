@@ -123,7 +123,8 @@ class Mod:
         await ctx.auto_react()
 
     async def __global_check(self, ctx):
-        if self.bot.is_owner(ctx.author):
+        owner = await self.bot.is_owner(ctx.author)
+        if owner:
             return True
 
         if ctx.author.permissions_in(ctx.channel).manage_messages:
