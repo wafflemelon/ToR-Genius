@@ -97,6 +97,10 @@ class TorGenius(commands.Bot):
             await ctx.author.send(
                 'Sorry. This command is disabled and cannot be used.'
             )
+        elif isinstance(error, commands.MissingRequiredArgument):
+            await ctx.send(error)
+        elif isinstance(error, commands.TooManyArguments):
+            await ctx.send('You passed too many parameters for that command.')
         elif isinstance(error, commands.CommandInvokeError):
             log.warning(f'Command error on command {ctx.command.qualified_name}'
                         f' from {ctx.author}: \n {error.original.__traceback__}'
