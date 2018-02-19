@@ -296,6 +296,7 @@ class Meta:
         )
 
     @commands.command(aliases=['info'])
+    @commands.guild_only()
     async def about(self, ctx):
         """Details about this bot"""
 
