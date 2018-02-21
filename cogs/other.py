@@ -491,7 +491,7 @@ class Other:
     @staticmethod
     async def on_reaction_add(reaction, user):
         if reaction.message.guild.id == 330777295952543744:
-            if str(reaction) == '⭐️' and reaction.message.author == user:
+            if str(reaction) == '⭐' and reaction.message.author == user:
                 await reaction.message.channel.send(f'{user.mention} '
                                                     f'selfstars are bad and you'
                                                     f' should feel bad.')
