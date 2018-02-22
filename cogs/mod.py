@@ -215,7 +215,7 @@ class Mod:
     @has_permissions(manage_messages=True, check_both=True)
     async def purge_from(self, ctx, user: commands.MemberConverter,
                          count: purge_count = 20):
-        """Purge any messages from a user0"""
+        """Purge any messages from a user"""
         r = await ctx.channel.purge(
             limit=count, check=lambda m: m.author is user
         )

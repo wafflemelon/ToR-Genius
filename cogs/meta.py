@@ -11,7 +11,7 @@ import discord
 from discord.ext import commands
 
 from cogs.utils.checks import is_mod
-from .utils.paginator import HelpPaginator, Pages
+from .utils.paginator import HelpPaginator, Pages, CannotPaginate
 
 
 class Prefix(commands.Converter):
@@ -29,6 +29,9 @@ class Meta:
 
     def __init__(self, bot):
         self.bot = bot
+
+        value = getattr(bot, 'help_fallback', None)
+        self.bot.help_fallback = bot.get_command('help') if not value else value
         bot.remove_command('help')
 
     @staticmethod
@@ -43,25 +46,36 @@ class Meta:
         """Helps you out a bit ;)"""
         # noinspection PyBroadException
         try:
-            if command is None:
-                p = await HelpPaginator.from_bot(ctx)
-            else:
-                entity = self.bot.get_cog(command) \
-                         or self.bot.get_command(command)
-
-                if entity is None:
-                    clean = command.replace('@', '@ ')  # non breaking space
-                    return await ctx.send(
-                        f'Command or category "{clean}" not found'
-                    )
-                elif isinstance(entity, commands.Command):
-                    p = await HelpPaginator.from_command(ctx, entity)
+            if ctx.me.permissions_in(ctx.channel).add_reactions:
+                if command is None:
+                    p = await HelpPaginator.from_bot(ctx)
                 else:
-                    p = await HelpPaginator.from_cog(ctx, entity)
+                    entity = self.bot.get_cog(command) \
+                             or self.bot.get_command(command)
 
-            await p.paginate()
-        except Exception as e:
-            ctx.send(f'```\n{e}\n```')
+                    if entity is None:
+                        clean = command.replace('@', '@ ')  # non breaking space
+                        return await ctx.send(
+                            f'Command or category "{clean}" not found'
+                        )
+                    elif isinstance(entity, commands.Command):
+                        p = await HelpPaginator.from_command(ctx, entity)
+                    else:
+                        p = await HelpPaginator.from_cog(ctx, entity)
+
+                await p.paginate()
+            else:
+                # await ctx.invoke(self.bot.help_fallback,
+                #                  command)
+                if command:
+                    await self.bot.help_fallback.callback(
+                        ctx, *command.split(' ')
+                    )
+                else:
+                    await self.bot.help_fallback.callback(ctx)
+
+        except CannotPaginate as e:
+            ctx.send(e)
 
     @commands.group(name='prefix', invoke_without_command=True)
     async def prefix(self, ctx):
