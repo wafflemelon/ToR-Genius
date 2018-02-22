@@ -122,6 +122,7 @@ class Fun:
 
     @commands.command(hidden=True)
     async def this(self, ctx):
+        """memes"""
         if ctx.prefix != 'de;et ':
             return
 
@@ -141,6 +142,9 @@ class Fun:
     # noinspection SpellCheckingInspection
     @commands.command(aliases=['rencode', 'encode'])
     async def random_encode(self, ctx, message, iterations: int = 4):
+        """(prob won't work) randomly encode a string using a number of methods.
+
+        Hint: Binary is utf-8."""
         # Not using context manager because the typing remains after sending
         # a message. #blamedanny
 
