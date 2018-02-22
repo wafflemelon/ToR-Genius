@@ -35,7 +35,7 @@ async def check_permissions(ctx, perms, *, check=all, check_self=False,
             perms.items()
         )
 
-        return resolved1_check and resolved2_check
+        return (resolved1_check or owner) and resolved2_check
 
     resolved = ctx.channel.permissions_for(
         ctx.author if not check_self else ctx.guild.me

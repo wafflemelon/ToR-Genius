@@ -326,7 +326,7 @@ class Mod:
 
     @staticmethod
     async def p_wrap(ctx, list_o_messages):
-        await ctx.send(f'I :wastebasket: {len(list_o_messages)} '
+        await ctx.send(f'I :wastebasket: {len(list_o_messages)-1} '
                        f'message{"s" if len(list_o_messages) > 1 else ""}.',
                        delete_after=10)
 
