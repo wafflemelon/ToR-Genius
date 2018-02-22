@@ -6,18 +6,34 @@
 # error junk
 # from https://github.com/Rapptz/RoboDanny/blob/rewrite/cogs/mod.py
 
+import datetime
 import logging
+import re
+import string
 import time
 from collections import Counter
-from datetime import datetime
 
 import discord
+import emoji
 import humanize
 from discord.ext import commands
 
 from cogs.utils.checks import has_permissions
 
 log = logging.getLogger(__name__)
+
+
+def purge_count(arg):
+    try:
+        arg = int(arg)
+    except ValueError:
+        raise commands.BadArgument('The purge amount needs to be an int.')
+
+    if arg > 300:
+        raise commands.BadArgument('The purge amount can\'t be above 300')
+
+    # add one because of the message sent to invoke the command
+    return arg + 1
 
 
 class Mod:
@@ -138,7 +154,7 @@ class Mod:
                 return True
 
             time_to_wait = humanize.naturaldelta(
-                datetime.fromtimestamp(channel_ld + 60)
+                datetime.datetime.fromtimestamp(channel_ld + 60)
             )
             await ctx.author.send(
                 f'Sorry, but the bot is on lockdown because some people were '
@@ -148,6 +164,128 @@ class Mod:
         else:
             # No lockdown active, continue
             return True
+
+    @commands.group(aliases=['delete', 'prune'],
+                    invoke_without_command=True)
+    @has_permissions(manage_messages=True)
+    async def purge(self, ctx, count: purge_count = None):
+        """Purge X number of messages. 20 by default.
+
+        Calling with no arguments shows help.
+
+        Calling with a count will purge that count with no criteria."""
+        if not count:
+            return await ctx.show_help('purge')
+
+        await ctx.channel.purge(limit=count)
+
+    @purge.command(name='all')
+    async def purge_all(self, ctx, count: purge_count = 20):
+        """Alias for `purge 20`"""
+        await ctx.channel.purge(limit=count)
+
+    @purge.command(name='embeds', alises=['embed'])
+    async def purge_embeds(self, ctx, count: purge_count = 20):
+        """Purge any messages with an embed (image, link, or otherwise)"""
+        await ctx.channel.purge(
+            limit=count,
+            check=lambda m: len(m.embeds) > 0 or len(m.attachments) > 0
+        )
+
+    @purge.command(name='with', aliases=['in', 'contains'])
+    async def purge_with(self, ctx, content: str.lower,
+                         count: purge_count = 20):
+        """Purge any message containing a certain string."""
+        await ctx.channel.purge(
+            limit=count, check=lambda m: content in m.content.lower()
+        )
+
+    @purge.command(name='from', aliases=['author'])
+    async def purge_from(self, ctx, user: commands.MemberConverter,
+                         count: purge_count = 20):
+        """Purge any messages from a user0"""
+        await ctx.channel.purge(
+            limit=count, check=lambda m: m.author is user
+        )
+
+    @purge.command(name='bots', aliases=['bot'])
+    async def purge_bots(self, ctx, count: purge_count = 20, prefix: str = '!'):
+        """Purge a message from any bots, and optionally starting with a
+        certain prefix"""
+        await ctx.channel.purge(
+            limit=count,
+            check=lambda m: m.author.bot or m.content.startswith(prefix)
+        )
+
+    @purge.command(name='regex', aliases=['re'])
+    async def purge_regex(self, ctx, regex: str, count: purge_count = 20):
+        """Advanced: Purge any message that matches a certain regex"""
+        await ctx.channel.purge(
+            limit=count,
+            check=lambda m: re.match(regex, m.content)
+        )
+
+    @purge.command(name='emoji', alises=['emote', 'emojis'])
+    async def purge_emojis(self, ctx, count: purge_count = 20):
+        """Purge any message that contains emojis"""
+        await ctx.channel.purge(
+            limit=count,
+            check=lambda m:
+            any([c in emoji.UNICODE_EMOJI for c in m.content])
+            or re.match(r'<:.+:[1-9]+>', m.content)
+        )
+
+    @purge.command(name='urls', aliases=['url', 'links', 'link'])
+    async def purge_urls(self, ctx, count: purge_count = 20):
+        """Purge any message that contains a certain URL"""
+        regex = r'(?:https?:\/\/)?(?:[\w]+\.)(?:\.?[\w]{2,})+'
+
+        await ctx.channel.purge(
+            limit=count,
+            check=lambda m: re.match(regex, m.content)
+        )
+
+    # noinspection SpellCheckingInspection
+    @purge.command(name='nonascii', aliases=['noascii'])
+    async def purge_non_ascii(self, ctx, count: purge_count = 20):
+        """Purge any message not containing normal ascii charecters"""
+        await ctx.channel.purge(
+            limit=count,
+            check=lambda m: any([c not in string.printable for c in m.content])
+        )
+
+    @purge.command(name='reactions', aliases=['react'])
+    async def purge_reactions(self, ctx, count: purge_count = 20):
+        """Clear all the reactions from messages"""
+        [await m.clear_reactions()
+         async for m in ctx.channel.history(limit=count)]
+
+    # noinspection SpellCheckingInspection
+    @purge.command(name='roleless', aliases=['whitenames'])
+    async def purge_roleless(self, ctx, count: purge_count = 20):
+        """Purge any messages from users with 0 roles"""
+        await ctx.channel.purge(
+            limit=count,
+            check=lambda m: len(m.author.roles) < 1
+        )
+
+    # noinspection SpellCheckingInspection
+    @purge.command(name='new', aliases=['newusers', 'raid'])
+    async def purge_new(self, ctx, count: purge_count = 20,
+                        time_ago: int = 60):
+        """Purge any messages from members that joined X minutes ago
+        (default 60)"""
+        cutoff = datetime.datetime.now() - datetime.timedelta(
+            minutes=time_ago)
+        await ctx.channel.purge(
+            limit=count,
+            check=lambda m: m.author.joined_at > cutoff
+        )
+
+    @purge.command(name='me')
+    async def purge_me(self, ctx, count: purge_count = 20):
+        """Same as `clean`"""
+        await ctx.run_command('clean', limit=count)
 
 
 def setup(bot):
