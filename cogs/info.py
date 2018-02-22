@@ -8,6 +8,7 @@ import humanize
 from PIL import Image, ImageDraw
 from discord.ext import commands
 
+from cogs.utils import db
 from cogs.utils.paginator import Pages
 
 # following is from
@@ -21,6 +22,11 @@ def format_time(time):
         return "Unknown"
     return "{} ({} UTC)".format(
         humanize.naturaltime(time + (datetime.now() - datetime.utcnow())), time)
+
+
+class LangTable(db.Table, table_name='lang'):
+    user_id = db.Column(db.Integer(big=True), primary_key=True)
+    lang_desc = db.Column(db.String)
 
 
 # use function here because we don't need `ctx`
@@ -210,6 +216,41 @@ class Info:
 
         p = Pages(ctx, entries=sorted(result, key=locale.strxfrm))
         await p.paginate()
+
+    @commands.group(aliases=['lang'])
+    async def language(self, ctx):
+        if ctx.invoked_subcommand is None:
+            await ctx.show_help('language')
+
+    @language.command(name='set')
+    async def lang_set(self, ctx, *, lang):
+        query = """
+INSERT INTO lang (user_id, lang_desc) VALUES ($1, $2)
+ON CONFLICT (user_id)
+  DO UPDATE SET lang_desc = EXCLUDED.lang_desc;
+        """
+
+        await ctx.db.execute(query, ctx.author.id, lang)
+        await ctx.auto_react()
+
+    @language.command(name='get')
+    async def lang_get(self, ctx, *, user: commands.MemberConverter = None):
+        query = """
+SELECT lang_desc
+FROM lang 
+WHERE user_id = $1;"""
+
+        user = user or ctx.author
+
+        res = await ctx.db.fetchval(query, user.id)
+
+        if not res:
+            return await ctx.send("I couldn't find a language description of "
+                                  "that user. Sorry.")
+
+        await ctx.send(
+            f'{user.display_name}\'s language description is "{res}".'
+        )
 
 
 def setup(bot):
