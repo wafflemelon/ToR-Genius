@@ -219,11 +219,13 @@ class Info:
 
     @commands.group(aliases=['lang'])
     async def language(self, ctx):
+        """Set/get other peoples description of the languages they know."""
         if ctx.invoked_subcommand is None:
             await ctx.show_help('language')
 
     @language.command(name='set')
     async def lang_set(self, ctx, *, lang):
+        """Set your language description to something."""
         query = """
 INSERT INTO lang (user_id, lang_desc) VALUES ($1, $2)
 ON CONFLICT (user_id)
@@ -235,6 +237,7 @@ ON CONFLICT (user_id)
 
     @language.command(name='get')
     async def lang_get(self, ctx, *, user: commands.MemberConverter = None):
+        """Get your own or someone else's language description"""
         query = """
 SELECT lang_desc
 FROM lang 
