@@ -177,6 +177,8 @@ class Mod:
         if not count:
             return await ctx.show_help('purge')
 
+        await ctx.message.delete()
+
         r = await ctx.channel.purge(limit=count)
 
         await self.p_wrap(ctx, r)
@@ -185,6 +187,9 @@ class Mod:
     @has_permissions(manage_messages=True, check_both=True)
     async def purge_all(self, ctx, count: purge_count = 20):
         """Alias for `purge 20`"""
+
+        await ctx.message.delete()
+
         r = await ctx.channel.purge(limit=count)
 
         await self.p_wrap(ctx, r)
@@ -193,6 +198,9 @@ class Mod:
     @has_permissions(manage_messages=True, check_both=True)
     async def purge_embeds(self, ctx, count: purge_count = 20):
         """Purge any messages with an embed (image, link, or otherwise)"""
+
+        await ctx.message.delete()
+
         r = await ctx.channel.purge(
             limit=count,
             check=lambda m: len(m.embeds) > 0 or len(m.attachments) > 0
@@ -205,6 +213,9 @@ class Mod:
     async def purge_with(self, ctx, content: str.lower,
                          count: purge_count = 20):
         """Purge any message containing a certain string."""
+
+        await ctx.message.delete()
+
         r = await ctx.channel.purge(
             limit=count, check=lambda m: content in m.content.lower()
         )
@@ -216,6 +227,9 @@ class Mod:
     async def purge_from(self, ctx, user: commands.MemberConverter,
                          count: purge_count = 20):
         """Purge any messages from a user"""
+
+        await ctx.message.delete()
+
         r = await ctx.channel.purge(
             limit=count, check=lambda m: m.author is user
         )
@@ -227,6 +241,9 @@ class Mod:
     async def purge_bots(self, ctx, count: purge_count = 20, prefix: str = '!'):
         """Purge a message from any bots, and optionally starting with a
         certain prefix"""
+
+        await ctx.message.delete()
+
         r = await ctx.channel.purge(
             limit=count,
             check=lambda m: m.author.bot or m.content.startswith(prefix)
@@ -238,6 +255,9 @@ class Mod:
     @has_permissions(manage_messages=True, check_both=True)
     async def purge_regex(self, ctx, regex: str, count: purge_count = 20):
         """Advanced: Purge any message that matches a certain regex"""
+
+        await ctx.message.delete()
+
         r = await ctx.channel.purge(
             limit=count,
             check=lambda m: re.match(regex, m.content)
@@ -249,6 +269,9 @@ class Mod:
     @has_permissions(manage_messages=True, check_both=True)
     async def purge_emojis(self, ctx, count: purge_count = 20):
         """Purge any message that contains emojis"""
+
+        await ctx.message.delete()
+
         r = await ctx.channel.purge(
             limit=count,
             check=lambda m:
@@ -264,6 +287,8 @@ class Mod:
         """Purge any message that contains a certain URL"""
         regex = r'(?:https?:\/\/)?(?:[\w]+\.)(?:\.?[\w]{2,})+'
 
+        await ctx.message.delete()
+
         r = await ctx.channel.purge(
             limit=count,
             check=lambda m: re.match(regex, m.content)
@@ -276,6 +301,9 @@ class Mod:
     @has_permissions(manage_messages=True, check_both=True)
     async def purge_non_ascii(self, ctx, count: purge_count = 20):
         """Purge any message not containing normal ascii charecters"""
+
+        await ctx.message.delete()
+
         r = await ctx.channel.purge(
             limit=count,
             check=lambda m: any([c not in string.printable for c in m.content])
@@ -287,14 +315,22 @@ class Mod:
     @has_permissions(manage_messages=True, check_both=True)
     async def purge_reactions(self, ctx, count: purge_count = 20):
         """Clear all the reactions from messages"""
-        [await m.clear_reactions()
-         async for m in ctx.channel.history(limit=count)]
+
+        await ctx.message.delete()
+
+        r = [await m.clear_reactions()
+             async for m in ctx.channel.history(limit=count)]
+
+        await self.p_wrap(ctx, r)
 
     # noinspection SpellCheckingInspection
     @purge.command(name='roleless', aliases=['whitenames'])
     @has_permissions(manage_messages=True, check_both=True)
     async def purge_roleless(self, ctx, count: purge_count = 20):
         """Purge any messages from users with 0 roles"""
+
+        await ctx.message.delete()
+
         r = await ctx.channel.purge(
             limit=count,
             check=lambda m: len(m.author.roles) < 1
@@ -311,6 +347,9 @@ class Mod:
         (default 60)"""
         cutoff = datetime.datetime.now() - datetime.timedelta(
             minutes=time_ago)
+
+        await ctx.message.delete()
+
         r = await ctx.channel.purge(
             limit=count,
             check=lambda m: m.author.joined_at > cutoff
