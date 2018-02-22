@@ -74,6 +74,8 @@ class Meta:
                 else:
                     await self.bot.help_fallback.callback(ctx)
 
+                await ctx.auto_react()
+
         except CannotPaginate as e:
             ctx.send(e)
 
