@@ -265,7 +265,7 @@ WHERE user_id = $1;"""
             f'{humanize.naturaldelta(datetime.now() - self.bot.uptime)}.'
             if not exact
             else f'I have been online since '
-                 f'{self.bot.uptime.strftime("%a %d %b %Y - %I:%M:%S %p")}.'
+                 f'{self.bot.uptime.strftime("%a %d %b %Y — %I:%M:%S %p")}.'
         )
 
 
