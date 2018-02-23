@@ -263,7 +263,7 @@ WHERE user_id = $1;"""
         await ctx.send(
             f'I have been online for about '
             f'{humanize.naturaldelta(datetime.now() - self.bot.uptime)}.'
-            if exact
+            if not exact
             else f'I have been online since '
                  f'{self.bot.uptime.strftime("%a %d %b %Y - %I:%M:%S %p")}.'
         )
