@@ -8,6 +8,7 @@
 
 import asyncio
 import copy
+import datetime
 import logging
 import random
 import sys
@@ -158,6 +159,10 @@ class TorGenius(commands.Bot):
 
     async def on_ready(self):
         print(f'Ready: {self.user} (ID: {self.user.id})')
+
+        if not hasattr(self, 'uptime'):
+            # noinspection PyAttributeOutsideInit
+            self.uptime = datetime.datetime.now()
 
         game = random.choice(self.game_list)
 

@@ -255,6 +255,15 @@ WHERE user_id = $1;"""
             f'{user.display_name}\'s language description is "{res}".'
         )
 
+    @commands.command()
+    async def uptime(self, ctx, exact: bool = False):
+        """Get the bots uptime, with an optional exact time."""
+        await ctx.send(
+            f'I have been online for about '
+            f'{humanize.naturaldelta(datetime.now() - self.bot.uptime)}.'
+            if not exact else f'I have been online since {self.bot.uptime}.'
+        )
+
 
 def setup(bot):
     bot.add_cog(Info(bot))
