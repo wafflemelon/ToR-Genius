@@ -20,6 +20,7 @@ from discord.ext import commands
 import config
 from cogs.utils.config import Config
 from cogs.utils.context import Context
+from cogs.utils.paginator import CannotPaginate
 
 description = "I'm a bot that does stuff"
 
@@ -122,6 +123,9 @@ class TorGenius(commands.Bot):
                 f'{error.original.__class__.__name__}: {error.original}',
                 file=sys.stderr
             )
+        elif isinstance(error, CannotPaginate):
+            await ctx.send("I can't use that command here because I don't have "
+                           "the add reactions permissions.")
         elif isinstance(error, commands.CheckFailure):
             if self.lockdown.get(ctx.channel, None):
                 return

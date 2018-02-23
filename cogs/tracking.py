@@ -5,6 +5,8 @@ import traceback
 import discord
 from discord.ext import commands
 
+from cogs.utils.paginator import CannotPaginate
+
 
 class Tracking:
     def __init__(self, bot):
@@ -47,7 +49,7 @@ class Tracking:
             commands.NoPrivateMessage, commands.BadArgument,
             commands.DisabledCommand, commands.CommandNotFound,
             commands.UserInputError, discord.Forbidden,
-            commands.CheckFailure
+            commands.CheckFailure, CannotPaginate
         )
 
         error = getattr(error, 'original', error)
