@@ -258,10 +258,14 @@ WHERE user_id = $1;"""
     @commands.command()
     async def uptime(self, ctx, exact: bool = False):
         """Get the bots uptime, with an optional exact time."""
+
+        # thee floor is good if-else and formatting
         await ctx.send(
             f'I have been online for about '
             f'{humanize.naturaldelta(datetime.now() - self.bot.uptime)}.'
-            if not exact else f'I have been online since {self.bot.uptime}.'
+            if exact
+            else f'I have been online since '
+                 f'{self.bot.uptime.strftime("%a %d %b %Y - %I:%M:%S %p")}.'
         )
 
 
