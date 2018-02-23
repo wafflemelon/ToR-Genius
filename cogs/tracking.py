@@ -75,7 +75,7 @@ class Tracking:
         await self.make_report(embed=e)
 
 
-old_on_error = commands.Bot.on_error()
+old_on_error = commands.Bot.on_error
 
 
 # must match func sig
