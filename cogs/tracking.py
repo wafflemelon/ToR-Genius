@@ -88,7 +88,9 @@ async def new_on_error(self, event, *args, **kwargs):
 
     # noinspection PyBroadException
     try:
-        await Tracking.make_report(embed=e)
+        await self.get_channel(
+            self.config.report_channel
+        ).send(*args, **kwargs)
     except:
         pass
 
@@ -98,5 +100,5 @@ def setup(bot):
     commands.Bot.on_error = new_on_error
 
 
-def teardown(bot):
+def teardown(_):
     commands.Bot.on_error = old_on_error
