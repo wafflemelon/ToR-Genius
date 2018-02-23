@@ -41,7 +41,8 @@ initial_extensions = [
     'cogs.jokes',
     'cogs.bostonlib',
     'cogs.custom',
-    'cogs.logging'
+    'cogs.logging',
+    'cogs.tracking'
 ]
 
 
@@ -87,6 +88,11 @@ class TorGenius(commands.Bot):
             except Exception:
                 print(f'Failed to load extension {extension}.', file=sys.stderr)
                 traceback.print_exc()
+
+    # convenience prop
+    @property
+    def config(self):
+        return __import__('config')
 
     async def on_command_error(self, ctx, error):
 
