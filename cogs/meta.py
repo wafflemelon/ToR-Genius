@@ -94,7 +94,10 @@ class Meta:
         # Don't list the mention prefix twice
         del prefixes[1]
 
-        p = Pages(ctx, entries=prefixes)
+        p = Pages(
+            ctx,
+            entries=[f'{p[0]}' + (' (regex)' if p[1] else '') for p in prefixes]
+        )
         await p.paginate()
 
     # Ignore extra for when people forget to quote
@@ -103,7 +106,7 @@ class Meta:
     # add multiple prefixes or they wanted to add one multi-word prefix.
     @is_mod()
     @prefix.command(name='add', ignore_extra=False)
-    async def prefix_add(self, ctx, prefix: Prefix):
+    async def prefix_add(self, ctx, prefix: Prefix, regex: bool = False):
         """Appends a prefix to the list of custom prefixes.
 
 
@@ -128,7 +131,7 @@ class Meta:
         # Error checking in Prefix class (top o' file)
 
         prefixes = self.bot.get_other_prefixes(ctx.guild)
-        prefixes.append(prefix)
+        prefixes.append([prefix, regex])
 
         try:
             await self.bot.set_guild_prefixes(ctx.guild, prefixes)
@@ -160,9 +163,10 @@ class Meta:
         """
 
         prefixes = self.bot.get_other_prefixes(ctx.guild)
+        prefixes_only = [p[0] for p in self.bot.get_other_prefixes(ctx.guild)]
 
         try:
-            prefixes.remove(prefix)
+            del prefixes[prefixes_only.index(prefix)]
         except ValueError:
             await ctx.auto_react('🚫')
             await ctx.send("That's not one of my prefixes, sorry!")
@@ -189,7 +193,7 @@ class Meta:
     async def prefix_reset(self, ctx):
         """Resets to the default prefix, `-`."""
 
-        await self.bot.set_guild_prefixes(ctx.guild, ['-'])
+        await self.bot.set_guild_prefixes(ctx.guild, [['-', False]])
         await ctx.auto_react()
 
     @commands.command(aliases=['pong'])

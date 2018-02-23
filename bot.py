@@ -11,11 +11,13 @@ import copy
 import datetime
 import logging
 import random
+import re
 import sys
 import traceback
 
 import discord
 from discord.ext import commands
+from discord.ext.commands.view import StringView
 
 import config
 from cogs.utils.config import Config
@@ -56,6 +58,9 @@ def _prefix(bot, msg):
         base.extend(['-', ';', 'tor ', ''])
     else:
         base.extend(bot.prefixes.get(msg.guild.id, ['-']))
+
+    # None of these are regexs
+    base = [p if isinstance(p, list) else [p, False] for p in base]
 
     return base
 
@@ -163,7 +168,8 @@ class TorGenius(commands.Bot):
         else:
             await self.prefixes.put(
                 guild.id,
-                sorted(set(prefixes), reverse=True)
+                # maybe a bad idea not to set this anymore. eh.
+                sorted(prefixes, reverse=True, key=lambda p: p[0])
             )
 
     async def on_ready(self):
@@ -178,6 +184,60 @@ class TorGenius(commands.Bot):
         await self.change_presence(
             game=(discord.Game(name=game))
         )
+
+    async def get_context(self, message, *, cls=Context):
+        view = StringView(message.content)
+        ctx = cls(prefix=None, view=view, bot=self, message=message)
+
+        if self._skip_check(message.author.id, self.user.id):
+            return ctx
+
+        prefix = await self.get_prefix(message)
+        invoked_prefix = prefix
+
+        if isinstance(prefix, str):
+            if not view.skip_string(prefix):
+                return ctx
+        elif isinstance(prefix, list) \
+                and any([isinstance(p, list) for p in prefix]):
+            # Regex time
+            for p in prefix:
+                if isinstance(p, list):
+                    if p[1]:
+                        # regex prefix parsing
+                        reg = re.match(p[0], message.content)
+                        if reg:
+                            # Matches, this is the prefix
+                            invoked_prefix = p
+
+                            # redo the string view with the capture group
+                            view = StringView(reg.groups()[0])
+
+                            invoker = view.get_word()
+                            ctx.invoked_with = invoker
+                            ctx.prefix = invoked_prefix
+                            ctx.command = self.all_commands.get(reg.groups()[0])
+                            return ctx
+                    else:
+                        # regex has highest priority or something idk
+                        # what I'm doing help
+                        continue
+
+            # No prefix found, use the branch below
+            prefix = [p[0] for p in prefix if not p[1]]
+            invoked_prefix = discord.utils.find(view.skip_string, prefix)
+            if invoked_prefix is None:
+                return ctx
+        else:
+            invoked_prefix = discord.utils.find(view.skip_string, prefix)
+            if invoked_prefix is None:
+                return ctx
+
+        invoker = view.get_word()
+        ctx.invoked_with = invoker
+        ctx.prefix = invoked_prefix
+        ctx.command = self.all_commands.get(invoker)
+        return ctx
 
     async def process_commands(self, message):
         ctx = await self.get_context(message, cls=Context)
@@ -205,6 +265,8 @@ class TorGenius(commands.Bot):
     def run(self):
         super().run(config.token, reconnect=True)
 
+    # ur face is a redeclaration
+    # noinspection PyRedeclaration
     @property
     def config(self):
         return __import__('config')
