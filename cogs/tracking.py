@@ -38,10 +38,10 @@ class Tracking:
         await self.make_report(embed=e)
 
     async def on_guild_join(self, guild):
-        self.send_guild(discord.Embed(color=discord.Color.green()), guild)
+        await self.send_guild(discord.Embed(color=discord.Color.green()), guild)
 
     async def on_guild_remove(self, guild):
-        self.send_guild(discord.Embed(color=discord.Color.red()), guild)
+        await self.send_guild(discord.Embed(color=discord.Color.red()), guild)
 
     async def on_command_error(self, ctx, error):
         # must be tulpa
