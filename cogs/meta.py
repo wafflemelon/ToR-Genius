@@ -7,6 +7,7 @@
 import inspect
 import os
 import re
+import time
 
 import discord
 from discord.ext import commands
@@ -234,9 +235,17 @@ class Meta:
     @commands.command(aliases=['pong'])
     async def ping(self, ctx):
         """What do you think"""
-        await ctx.send(
-            f'Pong! {round(self.bot.latency*1000, 2):,}ms of latency! 🏓'
+
+        before = time.monotonic()
+        m = await ctx.send(
+            f'Pong! {round(self.bot.latency*1000, 2):,}ms of Discord WebSocket '
+            f'latency! 🏓'
         )
+        after = time.monotonic()
+
+        await m.edit(content=f'{m.content.strip("! 🏓")}, '
+                             f'{round((after-before)*1000, 2)}ms of message '
+                             f'latency! 🏓')
 
     @commands.command(aliases=['fb'])
     @commands.cooldown(rate=1, per=2 * 60, type=commands.BucketType.user)
