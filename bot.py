@@ -221,7 +221,7 @@ class TorGenius(commands.Bot):
                             invoker = view.get_word()
                             ctx.invoked_with = invoker
                             ctx.prefix = invoked_prefix
-                            ctx.command = self.all_commands.get(reg.groups()[0])
+                            ctx.command = self.all_commands.get(invoker)
                             return ctx
                     else:
                         # regex has highest priority or something idk
