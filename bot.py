@@ -207,6 +207,11 @@ class TorGenius(commands.Bot):
                         # regex prefix parsing
                         reg = re.match(p[0], message.content)
                         if reg:
+
+                            if message.content == reg.groups()[0]:
+                                # ignore * prefixes
+                                continue
+
                             # Matches, this is the prefix
                             invoked_prefix = p
 
