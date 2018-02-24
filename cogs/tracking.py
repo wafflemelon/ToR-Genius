@@ -90,7 +90,7 @@ async def new_on_error(self, event, *args, **kwargs):
     try:
         await self.get_channel(
             self.config.report_channel
-        ).send(*args, **kwargs)
+        ).send(embed=e)
     except:
         pass
 

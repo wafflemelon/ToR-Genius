@@ -6,6 +6,7 @@
 # Help command from R. Danny, along with feedback, pm, and prefixes
 import inspect
 import os
+import re
 
 import discord
 from discord.ext import commands
@@ -130,6 +131,17 @@ class Meta:
 
         # Error checking in Prefix class (top o' file)
 
+        if regex:
+            try:
+                # noinspection PyTypeChecker
+                reg = re.compile(prefix)
+
+                if reg.groups < 1:
+                    return await ctx.send('The regex needs at least '
+                                          'one capture group.')
+            except re.error:
+                return await ctx.send('That regex is invalid. Sorry.')
+
         prefixes = self.bot.get_other_prefixes(ctx.guild)
         prefixes.append([prefix, regex])
 
@@ -140,6 +152,25 @@ class Meta:
             await ctx.send(e)
         else:
             await ctx.auto_react()
+
+        if regex:
+            await ctx.send('You just added a regex prefix. These can break. '
+                           'In the case it does break, you can ping the bot '
+                           'followed by "prefix reset" (or clear) and the '
+                           'prefixes will be reset.')
+
+    async def on_message(self, message):
+        # dumb pycharm
+        # noinspection PyUnusedLocal
+        user_id = message.guild.me.id
+        reg = re.match(f'<@!?{user_id}> prefix (reset|clear)', message.content)
+        if reg:
+            if reg.groups()[0] == 'reset':
+                await self.bot.set_guild_prefixes(message.guild, [['-', False]])
+            else:
+                await self.bot.set_guild_prefixes(message.guild, [])
+
+            await message.channel.send('Hard reset prefixes.')
 
     @prefix_add.error
     async def prefix_add_error(self, ctx, error):
