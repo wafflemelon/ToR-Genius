@@ -222,6 +222,7 @@ class TorGenius(commands.Bot):
                             ctx.invoked_with = invoker
                             ctx.prefix = invoked_prefix
                             ctx.command = self.all_commands.get(invoker)
+                            ctx.view = view
                             return ctx
                     else:
                         # regex has highest priority or something idk
