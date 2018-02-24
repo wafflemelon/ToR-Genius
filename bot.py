@@ -7,7 +7,6 @@
 
 
 import asyncio
-import copy
 import datetime
 import logging
 import random
@@ -80,7 +79,6 @@ class TorGenius(commands.Bot):
         self.game_list = ['corn', 'k', 'never gonna...', 'serdeff',
                           'lauye9r v7&^*^*111', 'no', 'no u', 'farts r funny']
 
-        self.add_command(self.do)
         self.token = 'A dead meme'
 
         self.lockdown = {}
@@ -277,16 +275,3 @@ class TorGenius(commands.Bot):
     def config(self):
         return __import__('config')
 
-    # Not important, will fix later
-    @commands.command(hidden=True, enabled=False)
-    @commands.is_owner()
-    async def do(self, ctx, times: int, *, command):
-        """Repeats a command a specified number of times."""
-        msg = copy.copy(ctx.message)
-        msg.content = command
-
-        new_ctx = await self.get_context(msg, cls=Context)
-        new_ctx.db = ctx.db
-
-        for i in range(times):
-            await new_ctx.reinvoke()

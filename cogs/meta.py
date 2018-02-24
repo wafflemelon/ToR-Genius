@@ -362,6 +362,18 @@ class Meta:
             title='ToR Genius'
         )
 
+        e.add_field(name='Server', value='[Join the server!]'
+                                         '(https://discord.gg/fhefJb2)')
+
+        e.add_field(
+            name='Transcribers Of Reddit',
+            value='Transcribers of Reddit is a group of Redditors that are '
+                  'making the internet more accessible, one image at a time. '
+                  'Read more about them [here]('
+                  'https://www.reddit.com/r/TranscribersOfReddit/wiki/index). '
+                  'Join the Discord Guild [here.](https://discord.gg/b5DqZXq)'
+        )
+
         # blah blah hard coding is bad blah
         e.set_author(
             name=f'perryprog#9657',
