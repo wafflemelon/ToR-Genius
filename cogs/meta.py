@@ -97,7 +97,8 @@ class Meta:
 
         p = Pages(
             ctx,
-            entries=[f'{p[0]}' + (' (regex)' if p[1] else '') for p in prefixes]
+            entries=[f'`{p[0]}`' + (' (regex)' if p[1] else '')
+                     for p in prefixes]
         )
         await p.paginate()
 
