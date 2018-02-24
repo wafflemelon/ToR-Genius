@@ -161,11 +161,14 @@ class Meta:
                            'prefixes will be reset.')
 
     async def on_message(self, message):
+
         # dumb pycharm
         # noinspection PyUnusedLocal
         user_id = message.guild.me.id
         reg = re.match(f'<@!?{user_id}> prefix (reset|clear)', message.content)
         if reg:
+            if not message.author.permissions_in(message.channel).ban_members:
+                raise commands.CheckFailure()
             if reg.groups()[0] == 'reset':
                 await self.bot.set_guild_prefixes(message.guild, [['-', False]])
             else:
