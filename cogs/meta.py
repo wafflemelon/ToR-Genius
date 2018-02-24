@@ -164,7 +164,7 @@ class Meta:
 
         # dumb pycharm
         # noinspection PyUnusedLocal
-        user_id = message.guild.me.id
+        user_id = self.bot.user.id
         reg = re.match(f'<@!?{user_id}> prefix (reset|clear)', message.content)
         if reg:
             if not message.author.permissions_in(message.channel).ban_members:
