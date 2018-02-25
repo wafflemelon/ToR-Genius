@@ -665,7 +665,7 @@ class Admin:
                 else:
                     self.repl_embeds[shell].add_field(
                         name="`>>> {}`".format(cleaned),
-                        value="`Empty response, assumed successful.`",
+                        value="_`No response`_",
                         inline=False)
 
                     await self.repl_sessions[session].edit(

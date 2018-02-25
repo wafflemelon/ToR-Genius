@@ -386,6 +386,12 @@ class Meta:
                   'Join the Discord Guild [here.](https://discord.gg/b5DqZXq)'
         )
 
+        e.add_field(
+            name='Invite',
+            value='[Click here](https://discordapp.com/api/oauth2/authorize?cli'
+                  'ent_id=401477146511409183&permissions=8192&scope=bot)'
+        )
+
         # blah blah hard coding is bad blah
         e.set_author(
             name=f'perryprog#9657',
