@@ -465,7 +465,7 @@ class Admin:
     # the following code is used with permissions from ry00001#3487.
     # https://github.com/ry00001/Erio/blob/master/extensions/eshell.py
     # (modified)
-    @commands.group(invoke_without_command=True)
+    @commands.group(invoke_without_command=True, hidden=True)
     async def repl(self, ctx, *, name: str = None):
         """New stylish repl command"""
         session = ctx.message.channel.id
