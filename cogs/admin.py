@@ -490,7 +490,7 @@ class Admin:
             'ctx': ctx,
             'bot': self.bot,
             'message': ctx.message,
-            'server': ctx.message.guild,
+            'guild': ctx.message.guild,
             'channel': ctx.message.channel,
             'author': ctx.message.author,
             'discord': discord,
