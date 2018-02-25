@@ -18,12 +18,14 @@ import io
 import random
 import subprocess
 import textwrap
+import time
 import traceback
 from contextlib import redirect_stdout
 
 import aiohttp
 import discord
 from discord.ext import commands
+from texttable import Texttable
 
 from cogs.utils.context import Context
 
@@ -727,6 +729,59 @@ class Admin:
         except discord.Forbidden:
             pass
         await shell.edit(embed=self.repl_embeds[shell])
+
+    @commands.command(hidden=True)
+    async def sql(self, ctx, *, query: str):
+        """Run some SQL."""
+        # the imports are here because I imagine some people would want to use
+        # this cog as a base for their other cog, and since this one is kinda
+        # odd and unnecessary for most people, I will make it easy to remove
+        # for those people.
+        query = self.cleanup_code(query)
+
+        is_multistatement = query.count(';') > 1
+        if is_multistatement:
+            # fetch does not support multiple statements
+            strategy = ctx.db.execute
+        else:
+            strategy = ctx.db.fetch
+
+        # noinspection PyBroadException
+        try:
+            start = time.perf_counter()
+            results = await strategy(query)
+            dt = (time.perf_counter() - start) * 1000.0
+        except Exception:
+            return await ctx.send(f'```py\n{traceback.format_exc()}\n```')
+
+        rows = len(results)
+        if is_multistatement or rows == 0:
+            return await ctx.send(f'`{dt:.2f}ms: {results}`')
+
+        data = [list(results[0].keys())]
+        data.extend([list(r.values()) for r in results])
+        table = Texttable()
+        table.set_cols_dtype(['t'] * len(data[0]))
+        table.add_rows(data)
+        render = table.draw()
+
+        fmt = f'```\n{render}\n```\n*Returned {Plural(row=rows)} in {dt:.2f}ms*'
+        if len(fmt) > 2000:
+            await ctx.send((await haste_upload(fmt)))
+        else:
+            await ctx.send(fmt)
+
+
+class Plural:
+    def __init__(self, **attr):
+        iterator = attr.items()
+        self.name, self.value = next(iter(iterator))
+
+    def __str__(self):
+        v = self.value
+        if v == 0 or v > 1:
+            return f'{v} {self.name}s'
+        return f'{v} {self.name}'
 
 
 def setup(bot):
