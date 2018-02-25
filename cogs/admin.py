@@ -54,7 +54,7 @@ async def haste_upload(text):
         async with session.post('https://hastebin.com/documents/', data=text,
                                 headers={'Content-Type': 'text/plain'}) as r:
             r = await r.json()
-            return r['key']
+            return f'https://hastebin.com/{r["key"]}'
 
 
 async def gist_upload(files, public=False, description=''):
@@ -162,7 +162,7 @@ class Admin:
         await ctx.channel.trigger_typing()
         sout, serr = await run_subprocess(cmd)
 
-        out = ""
+        out = ''
 
         if sout:
             out = f'Stdout: ```{sout}```'
