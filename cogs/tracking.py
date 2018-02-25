@@ -49,7 +49,7 @@ class Tracking:
             commands.NoPrivateMessage, commands.BadArgument,
             commands.DisabledCommand, commands.CommandNotFound,
             commands.UserInputError, discord.Forbidden,
-            commands.CheckFailure, CannotPaginate
+            commands.CheckFailure, CannotPaginate, commands.CommandOnCooldown
         )
 
         error = getattr(error, 'original', error)
