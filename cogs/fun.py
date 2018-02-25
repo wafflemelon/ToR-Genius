@@ -7,10 +7,16 @@ import random
 from discord.ext import commands
 
 from cogs.admin import gist_upload
+from cogs.utils import db
 from cogs.utils.checks import tor_only
 from cogs.utils.encode_operations import EncodeOperations
 
 log = logging.getLogger(__name__)
+
+
+class CounterDB(db.Table, table_name='counters'):
+    name = db.Column(db.String, primary_key=True)
+    count = db.Column(db.Integer(big=True))
 
 
 class Fun:
@@ -169,6 +175,13 @@ class Fun:
             await ctx.send(key)
         else:
             await ctx.send(f'```{message}```')
+
+    @staticmethod
+    async def on_message(message):
+        if message.channel.id == 417369794883354625:
+            # noinspection SpellCheckingInspection
+            if 'boing' not in message.content.lower():
+                await message.delete()
 
 
 def setup(bot):
